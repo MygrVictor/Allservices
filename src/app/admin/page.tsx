@@ -4,6 +4,8 @@ import { fr } from "date-fns/locale";
 import { PageContainer } from "@/components/page-container";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 type AdminPageProps = {
   searchParams: {
     date?: string;
