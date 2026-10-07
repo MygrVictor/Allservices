@@ -15,7 +15,7 @@ import {
   type CatalogProduct,
   type Residence,
 } from "@/lib/catalog";
-import { SITE, isSiteInStandby, siteText } from "@/lib/site-config";
+import { isSiteInStandby, siteText } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { makeT, type Translate } from "@/lib/i18n";
@@ -644,7 +644,10 @@ export function ReservationForm({
                         {t("Hiver · 7j/7", "Winter · 7 days a week")}
                       </p>
                       <p className="text-lg font-bold">
-                        {t("9h – 12h  ·  15h – 19h", "9am – 12pm  ·  3pm – 7pm")}
+                        {t(
+                          "9h – 12h  ·  15h – 19h",
+                          "9am – 12pm  ·  3pm – 7pm",
+                        )}
                       </p>
                     </div>
                   </div>

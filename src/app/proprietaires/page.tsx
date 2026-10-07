@@ -2,26 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { PageContainer } from "@/components/page-container";
 import { SITE } from "@/lib/site-config";
-import {
-  formatEuros,
-  localizeProduct,
-  productsForAudience,
-  type ProductCategory,
-} from "@/lib/catalog";
+import { localizeProduct, productsForAudience } from "@/lib/catalog";
 import { getLocale } from "@/lib/i18n-server";
 import { makeT } from "@/lib/i18n";
-
-const OWNER_PHOTOS: Partial<Record<string, string>> = {
-  remise_cles: "/services/remise-cles.jpg",
-  etat_des_lieux: "/services/etat-des-lieux.jpg",
-};
 
 export default function ProprietairesPage() {
   const locale = getLocale();
   const t = makeT(locale);
-  const products = productsForAudience("proprietaire").map((p) =>
-    localizeProduct(p, locale),
-  );
+  productsForAudience("proprietaire").map((p) => localizeProduct(p, locale));
   const steps = [
     {
       title: t("Vous nous contactez", "You contact us"),
@@ -529,35 +517,6 @@ function SparkleIcon({ className }: { className?: string }) {
       />
     </svg>
   );
-}
-
-function HelpIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={iconBase(className)}>
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        d="M9.8 9a2.2 2.2 0 0 1 4.3.7c0 1.6-2.1 2-2.1 3.4"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <circle cx="12" cy="16.9" r="0.9" fill="currentColor" />
-    </svg>
-  );
-}
-
-function OwnerProductIcon({
-  category,
-  className,
-}: {
-  category: ProductCategory;
-  className?: string;
-}) {
-  if (category === "etat_des_lieux") {
-    return <ClipboardIcon className={className} />;
-  }
-
-  return <KeyIcon className={className} />;
 }
 
 function ClipboardIcon({ className }: { className?: string }) {

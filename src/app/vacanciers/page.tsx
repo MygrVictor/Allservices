@@ -6,7 +6,7 @@ import Link from "next/link";
 import { PageContainer } from "@/components/page-container";
 import { SiteCart } from "@/components/site-cart";
 import { useCart } from "@/components/cart-provider";
-import { SITE, siteText } from "@/lib/site-config";
+import { siteText, SITE } from "@/lib/site-config";
 import {
   formatEuros,
   localizeProduct,
