@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# All Services Montagne — Refonte
 
-## Getting Started
+Stack: Next.js 14 (App Router) + TypeScript + Tailwind + Prisma + PostgreSQL (Supabase) + Stripe + Resend.
 
-First, run the development server:
+## 1) Installation
+
+```bash
+npm install
+cp .env.example .env
+```
+
+Renseigner dans `.env`:
+
+- `DATABASE_URL`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `RESEND_API_KEY`
+- `EMAIL_FROM`
+- `EMAIL_TO_MANAGER`
+- `ADMIN_USER` / `ADMIN_PASSWORD`
+- `NEXT_PUBLIC_APP_URL`
+- `NEXT_PUBLIC_SITE_STATUS=active|veille`
+
+## 2) Base de données
+
+```bash
+npx prisma generate
+npx prisma migrate deploy
+npm run prisma:seed
+```
+
+## 3) Développement
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 4) Stripe webhook (local)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copier la clé webhook reçue dans `STRIPE_WEBHOOK_SECRET`.
 
-## Learn More
+## 5) Parcours livré
 
-To learn more about Next.js, take a look at the following resources:
+### Réservation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Aiguillage initial propriétaire/vacancier
+- Formulaire multi-étapes dynamique
+- Calcul du total en direct
+- Checkout Stripe
+- Confirmation `/reservation/success`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Back-office minimal
 
-## Deploy on Vercel
+- `/admin` protégé par Basic Auth (`ADMIN_USER`/`ADMIN_PASSWORD`)
+- Liste des réservations payées
+- Filtres: date, résidence, public
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 6) Pages
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `/`
+- `/proprietaires`
+- `/vacanciers`
+- `/reservation`
+- `/laverie-conciergerie`
+- `/bons-plans`
+- `/contact`
+- `/mentions-legales`
+- `/admin`
+
+## 7) Point métier à confirmer
+
+Produit ambigu **non injecté au checkout**:
+
+- Service de blanchisserie à domicile (4€ à 8€ selon variante)
+
+Décision attendue client:
+
+- commandé par propriétaire en amont,
+- ou par vacancier pendant le séjour.

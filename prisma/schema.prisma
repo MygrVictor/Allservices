@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TargetAudience {
+  proprietaire
+  vacancier
+}
+
+enum ProductCategory {
+  remise_cles
+  etat_des_lieux
+  linge
+  equipement_bebe
+  menage
+  livraison
+  blanchisserie
+  ski
+}
+
+enum Residence {
+  arc_1800
+  arc_2000
+}
+
+enum BookingStatus {
+  pending
+  paid
+  cancelled
+}
+
+model Product {
+  id             String         @id @default(cuid())
+  code           String         @unique
+  name           String
+  description    String?
+  priceCents     Int
+  targetAudience TargetAudience
+  category       ProductCategory
+  isActive       Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  bookingItems   BookingItem[]
+}
+
+model Booking {
+  id                String         @id @default(cuid())
+  targetAudience    TargetAudience
+  residence         Residence?
+  propertyReference String?
+  dateArrivee       DateTime
+  dateDepart        DateTime
+  creneauLivraison  String?
+  status            BookingStatus  @default(pending)
+  montantTotalCents Int
+  stripeSessionId   String?        @unique // héritage, conservé pour compatibilité
+  paymentProvider   String?
+  paymentRef        String?        @unique
+  /// Jeton secret permettant de télécharger le bon de commande sans compte client
+  downloadToken     String         @unique @default(cuid())
+  paidAt            DateTime?
+  clientNom         String
+  clientEmail       String
+  clientTelephone   String?
+  notes             String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  items             BookingItem[]
+
+  @@index([dateArrivee, dateDepart])
+  @@index([targetAudience, residence])
+}
+
+model BookingItem {
+  id           String  @id @default(cuid())
+  bookingId    String
+  productId    String
+  quantity     Int
+  unitPriceCents Int
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([bookingId])
+  @@index([productId])
+}
