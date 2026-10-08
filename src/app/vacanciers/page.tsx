@@ -309,7 +309,12 @@ export default function VacanciersPage() {
                 </div>
                 <span className="relative inline-flex shrink-0 items-center gap-2 self-start rounded-full bg-accent px-5 py-2.5 text-sm font-bold text-ardoise shadow transition group-hover:bg-accent-dark sm:self-auto">
                   {t("Voir les packs ski", "See ski packs")}
-                  <span aria-hidden className="transition group-hover:translate-x-1">→</span>
+                  <span
+                    aria-hidden
+                    className="transition group-hover:translate-x-1"
+                  >
+                    →
+                  </span>
                 </span>
               </Link>
             </div>
@@ -325,7 +330,10 @@ export default function VacanciersPage() {
               {t("Récupérer votre commande", "Getting your order")}
             </p>
             <h2 className="mt-1 text-3xl text-ardoise">
-              {t("Retrait ou livraison, au choix", "Collection or delivery, your choice")}
+              {t(
+                "Retrait ou livraison, au choix",
+                "Collection or delivery, your choice",
+              )}
             </h2>
           </div>
 
@@ -337,10 +345,16 @@ export default function VacanciersPage() {
                 </span>
                 <div>
                   <h3 className="text-lg font-semibold text-ardoise">
-                    {t("Retrait en conciergerie", "Collection at our concierge")}
+                    {t(
+                      "Retrait en conciergerie",
+                      "Collection at our concierge",
+                    )}
                   </h3>
                   <p className="text-sm text-slate-600">
-                    {t("Arc 1800 ou Arc 2000 · gratuit", "Arc 1800 or Arc 2000 · free")}
+                    {t(
+                      "Arc 1800 ou Arc 2000 · gratuit",
+                      "Arc 1800 or Arc 2000 · free",
+                    )}
                   </p>
                 </div>
               </div>
@@ -353,14 +367,18 @@ export default function VacanciersPage() {
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 <div className="rounded-xl bg-sapin p-3 text-white">
                   <p className="text-sm font-bold">❄ {t("Hiver", "Winter")}</p>
-                  <p className="text-xs text-white/85">{t("7j/7", "7 days a week")}</p>
+                  <p className="text-xs text-white/85">
+                    {t("7j/7", "7 days a week")}
+                  </p>
                   <p className="mt-1 text-sm font-semibold">
                     {t("9h–12h · 15h–19h", "9am–12pm · 3pm–7pm")}
                   </p>
                 </div>
                 <div className="rounded-xl bg-accent p-3 text-ardoise">
                   <p className="text-sm font-bold">☀ {t("Été", "Summer")}</p>
-                  <p className="text-xs">{t("Mar–dim · fermé lundi", "Tue–Sun · closed Mon")}</p>
+                  <p className="text-xs">
+                    {t("Mar–dim · fermé lundi", "Tue–Sun · closed Mon")}
+                  </p>
                   <p className="mt-1 text-sm font-semibold">
                     {t("9h30–12h · 15h30–18h30", "9:30am–12pm · 3:30pm–6:30pm")}
                   </p>
@@ -375,15 +393,23 @@ export default function VacanciersPage() {
                 </span>
                 <div>
                   <h3 className="text-lg font-semibold text-ardoise">
-                    {t("Livraison dans votre logement", "Delivery to your accommodation")}
+                    {t(
+                      "Livraison dans votre logement",
+                      "Delivery to your accommodation",
+                    )}
                   </h3>
                   <p className="text-sm text-slate-600">
-                    {t("Option à ajouter au panier", "Option added at checkout")}
+                    {t(
+                      "Option à ajouter au panier",
+                      "Option added at checkout",
+                    )}
                   </p>
                 </div>
               </div>
               <div className="mt-4 flex items-center gap-3 rounded-xl bg-primary-light/50 p-4">
-                <span className="text-3xl font-bold text-sapin">{site.deliveryWindow}</span>
+                <span className="text-3xl font-bold text-sapin">
+                  {site.deliveryWindow}
+                </span>
               </div>
               <p className="mt-3 text-sm text-slate-700">
                 {t(
@@ -396,7 +422,10 @@ export default function VacanciersPage() {
 
           <div className="mt-5 flex flex-col items-start justify-between gap-3 rounded-[20px] border border-primary/10 bg-neige p-4 sm:flex-row sm:items-center">
             <p className="text-sm font-medium text-ardoise">
-              {t("Une question sur votre commande ?", "A question about your order?")}
+              {t(
+                "Une question sur votre commande ?",
+                "A question about your order?",
+              )}
             </p>
             <a
               href={SITE.phoneHref}
@@ -477,22 +506,6 @@ function RouteIcon({ className }: { className?: string }) {
         strokeWidth="1.8"
         strokeLinecap="round"
       />
-    </svg>
-  );
-}
-
-function HomeIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={iconBase(className)}>
-      <path
-        d="M4 11.3 12 5l8 6.3"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="M6.5 10.5V19h11v-8.5" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M10 19v-4.5h4V19" stroke="currentColor" strokeWidth="1.8" />
     </svg>
   );
 }
