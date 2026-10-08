@@ -1,9 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getT } from "@/lib/i18n-server";
+import { getLocale, getT } from "@/lib/i18n-server";
+import { SITE, getStations } from "@/lib/site-config";
 
 export function SiteFooter() {
+  const locale = getLocale();
   const t = getT();
+  const stations = getStations(locale);
   return (
     <footer className="mt-16 border-t border-sapin/15 bg-gradient-to-b from-neige to-white">
       <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-10 text-sm text-slate-700 md:grid-cols-3">
@@ -17,32 +20,60 @@ export function SiteFooter() {
               className="h-9 w-auto object-contain"
             />
           </div>
-          <p className="mb-2 font-semibold text-ardoise">All Services</p>
-          <p className="flex items-start gap-2">
-            <MapPinIcon className="mt-0.5 h-4 w-4 shrink-0 text-sapin" />
-            {t(
-              "Arc 1800 — Galerie du Charvet (en bas de la Poste)",
-              "Arc 1800 — Galerie du Charvet (below the Post Office)",
-            )}
-          </p>
-          <p className="mt-1 flex items-start gap-2">
-            <MapPinIcon className="mt-0.5 h-4 w-4 shrink-0 text-sapin" />
-            {t(
-              "Arc 2000 — Place haute, en face de Skiset",
-              "Arc 2000 — Upper square, opposite Skiset",
-            )}
-          </p>
+          <p className="mb-2 font-semibold text-ardoise">{SITE.name}</p>
+          <ul className="space-y-1.5">
+            {stations.map((station) => (
+              <li key={station.id} className="flex items-start gap-2">
+                <MapPinIcon className="mt-0.5 h-4 w-4 shrink-0 text-sapin" />
+                <a
+                  href={station.mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-ardoise hover:underline"
+                >
+                  <span className="font-semibold">{station.name}</span>
+                  {" — "}
+                  {station.address}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
         <div className="rounded-panel border border-slate-200 bg-white p-4 shadow-sm">
           <p className="mb-2 font-semibold text-ardoise">Contact</p>
-          <p className="flex items-center gap-2">
+          <a
+            href={SITE.phoneHref}
+            className="flex items-center gap-2 hover:text-ardoise hover:underline"
+          >
             <PhoneIcon className="h-4 w-4 text-sapin" />
-            {t("Tél", "Phone")} : +33 (0)4 79 07 60 17
-          </p>
-          <p className="mt-1 flex items-center gap-2">
+            {t("Tél", "Phone")} : {SITE.phone}
+          </a>
+          <a
+            href={`mailto:${SITE.email}`}
+            className="mt-1 flex items-center gap-2 hover:text-ardoise hover:underline"
+          >
             <MailIcon className="h-4 w-4 text-sapin" />
-            Email : contact@allservicesmontagne.com
-          </p>
+            Email : {SITE.email}
+          </a>
+          <div className="mt-3 rounded-lg bg-slate-50 p-2.5 text-xs text-slate-600">
+            <p className="font-semibold text-ardoise">
+              {t("Horaires", "Opening hours")}
+            </p>
+            <p className="mt-1">
+              <span className="font-semibold">{t("Hiver", "Winter")}</span>
+              {t(
+                " : 7j/7 · 9h–12h et 15h–19h",
+                ": 7 days/week · 9am–12pm and 3pm–7pm",
+              )}
+            </p>
+            <p className="mt-0.5">
+              <span className="font-semibold">{t("Été", "Summer")}</span>
+              {t(
+                " : mar–dim · 9h30–12h et 15h30–18h30 (fermé lundi)",
+                ": Tue–Sun · 9:30am–12pm and 3:30pm–6:30pm (closed Monday)",
+              )}
+            </p>
+          </div>
         </div>
         <div className="flex flex-col gap-1 rounded-panel border border-slate-200 bg-white p-4 shadow-sm">
           <Link
@@ -59,12 +90,20 @@ export function SiteFooter() {
             <ChevronIcon className="h-4 w-4 text-sapin" />
             {t("Réservation en ligne", "Online booking")}
           </Link>
-          <p className="mt-2 text-xs text-slate-500">
-            {t(
-              "Saison été: mar-dim 9h30-12h / 15h30-18h30",
-              "Summer season: Tue–Sun 9:30am–12pm / 3:30pm–6:30pm",
-            )}
-          </p>
+          <Link
+            href="/laverie-conciergerie"
+            className="inline-flex items-center gap-2 hover:text-ardoise"
+          >
+            <ChevronIcon className="h-4 w-4 text-sapin" />
+            {t("Nos agences", "Our offices")}
+          </Link>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 hover:text-ardoise"
+          >
+            <ChevronIcon className="h-4 w-4 text-sapin" />
+            {t("Nous contacter", "Contact us")}
+          </Link>
         </div>
       </div>
     </footer>

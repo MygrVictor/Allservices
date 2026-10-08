@@ -94,13 +94,13 @@ export default function VacanciersPage() {
           pack
             ? "border-primary bg-gradient-to-br from-primary-light to-white shadow-xl ring-2 ring-primary/20 hover:shadow-2xl"
             : isSkiPack
-              ? "border-slate-200 bg-white shadow-sm"
+              ? "border-indigo-300 bg-gradient-to-br from-indigo-50 to-white shadow-md hover:border-indigo-500 hover:shadow-lg"
               : product.category === "linge"
-                ? "border-sapin/50 bg-white shadow-md hover:border-sapin hover:shadow-lg"
+                ? "border-sapin/50 bg-gradient-to-br from-sapin/15 via-primary-light/40 to-white shadow-md hover:border-sapin hover:shadow-lg"
                 : product.category === "equipement_bebe"
-                  ? "border-sky-300 bg-white shadow-md hover:border-sky-500 hover:shadow-lg"
-                  : "border-accent/60 bg-white shadow-md hover:border-accent hover:shadow-lg"
-        } ${isSkiPack ? "opacity-50" : ""}`}
+                  ? "border-sky-300 bg-gradient-to-br from-sky-100 to-white shadow-md hover:border-sky-500 hover:shadow-lg"
+                  : "border-accent/60 bg-gradient-to-br from-accent/25 to-white shadow-md hover:border-accent hover:shadow-lg"
+        }`}
       >
         {pack && (
           <span className="absolute -top-3 left-4 rounded-full bg-primary px-3 py-0.5 text-xs font-bold uppercase tracking-wide text-white shadow">
@@ -149,9 +149,22 @@ export default function VacanciersPage() {
 
   return (
     <>
-      <section className="border-b border-primary/10 bg-gradient-to-b from-primary-light/35 via-neige to-white py-12 sm:py-16">
+      <section className="relative isolate overflow-hidden border-b border-primary/10 py-12 sm:py-16">
+        {/* Fond : linge (public/background_customer.jpg) */}
+        <Image
+          src="/background_customer.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="-z-20 object-cover object-center"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-gradient-to-r from-white/75 via-white/40 to-transparent"
+        />
         <PageContainer>
-          <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+          <div className="max-w-3xl">
             <div>
               <p className="text-sm font-semibold tracking-wide text-sapin">
                 {t(
@@ -161,8 +174,8 @@ export default function VacanciersPage() {
               </p>
               <h1 className="mt-3 max-w-4xl text-4xl leading-tight text-ardoise sm:text-5xl">
                 {t(
-                  "Réservez votre linge et votre location de ski simplement, avant d'arriver aux Arcs.",
-                  "Book your linen and ski rental easily, before you arrive in Les Arcs.",
+                  "Réservez votre linge avant d'arriver sur les Arcs.",
+                  "Book your linen easily, before you arrive in Les Arcs.",
                 )}
               </h1>
               <p className="mt-5 max-w-3xl text-lg text-slate-700">
@@ -202,31 +215,15 @@ export default function VacanciersPage() {
                   {t("Voir les packs ski", "See ski packs")}
                 </Link>
               </div>
-            </div>
-
-            <div className="relative overflow-hidden rounded-[30px] border border-primary/10 bg-white shadow-xl">
-              <div className="relative aspect-[4/5] sm:aspect-[16/12] lg:aspect-[4/5]">
-                <Image
-                  src="/services/vacancier.jpg"
-                  alt={t("Vacanciers aux Arcs", "Holidaymakers in Les Arcs")}
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 32rem, 100vw"
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/45 via-transparent to-transparent" />
-              </div>
-              <div className="absolute inset-x-4 bottom-4 rounded-[22px] border border-white/25 bg-white/92 p-4 shadow-lg backdrop-blur-sm">
-                <p className="text-sm font-semibold text-ardoise">
-                  Arc 1800 & Arc 2000
-                </p>
-                <p className="mt-1 text-sm text-slate-700">
-                  {t(
-                    `Livraison du linge entre ${site.deliveryWindow} ou retrait en conciergerie pendant les heures d'ouverture.`,
-                    `Linen delivery between ${site.deliveryWindow} or collection at the concierge during opening hours.`,
-                  )}
-                </p>
-              </div>
+              <p className="mt-5 text-sm text-slate-700">
+                <span className="font-semibold text-ardoise">
+                  Arc 1800 & Arc 2000 ·{" "}
+                </span>
+                {t(
+                  `Livraison du linge entre ${site.deliveryWindow} ou retrait en conciergerie pendant les heures d'ouverture.`,
+                  `Linen delivery between ${site.deliveryWindow} or collection at the concierge during opening hours.`,
+                )}
+              </p>
             </div>
           </div>
         </PageContainer>
@@ -283,15 +280,38 @@ export default function VacanciersPage() {
                 {displayedProducts.map(renderProduct)}
               </div>
 
-              <p className="mt-10 rounded-panel border border-glacier bg-glacier/30 p-4 text-sm text-ardoise">
-                {t(
-                  "Vous cherchez une location de ski ?",
-                  "Looking for ski rental?",
-                )}{" "}
-                <Link href="/packs-ski" className="font-semibold underline">
-                  {t("Voir la page location de ski", "See the ski rental page")}
-                </Link>
-              </p>
+              <Link
+                href="/packs-ski"
+                className="group relative mt-10 flex flex-col gap-4 overflow-hidden rounded-[24px] bg-gradient-to-r from-primary-dark to-primary p-6 text-white shadow-lg transition hover:shadow-xl sm:flex-row sm:items-center sm:justify-between sm:p-7"
+              >
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -right-6 -top-10 text-[8rem] leading-none opacity-15"
+                >
+                  ⛷
+                </span>
+                <div className="relative">
+                  <p className="text-xs font-bold uppercase tracking-wide text-accent">
+                    {t("Partenaire Skiset", "Skiset partner")}
+                  </p>
+                  <p className="mt-1 text-xl font-semibold">
+                    {t(
+                      "Besoin de skis pour votre séjour ?",
+                      "Need skis for your stay?",
+                    )}
+                  </p>
+                  <p className="mt-1 text-sm text-white/85">
+                    {t(
+                      "Découvrez nos packs location de ski en partenariat avec Skiset, aux Arcs 1800 et 2000.",
+                      "Discover our ski rental packs with our partner Skiset, in Arc 1800 and 2000.",
+                    )}
+                  </p>
+                </div>
+                <span className="relative inline-flex shrink-0 items-center gap-2 self-start rounded-full bg-accent px-5 py-2.5 text-sm font-bold text-ardoise shadow transition group-hover:bg-accent-dark sm:self-auto">
+                  {t("Voir les packs ski", "See ski packs")}
+                  <span aria-hidden className="transition group-hover:translate-x-1">→</span>
+                </span>
+              </Link>
             </div>
           </div>
           <SiteCart />
@@ -300,33 +320,90 @@ export default function VacanciersPage() {
 
       <section className="pb-14 pt-12">
         <PageContainer>
-          <div className="rounded-panel border border-white/16 bg-white/90 p-6 shadow-xl backdrop-blur-sm">
-            <h2 className="flex items-center gap-2 text-2xl text-ardoise">
-              <span className="inline-flex rounded-full bg-primary-light/70 p-2 text-sapin">
-                <HomeIcon className="h-5 w-5" />
-              </span>
-              {t("Retrait ou livraison", "Collection or delivery")}
+          <div className="mb-6">
+            <p className="text-sm font-semibold tracking-wide text-sapin">
+              {t("Récupérer votre commande", "Getting your order")}
+            </p>
+            <h2 className="mt-1 text-3xl text-ardoise">
+              {t("Retrait ou livraison, au choix", "Collection or delivery, your choice")}
             </h2>
-            <ul className="mt-4 space-y-2 text-sm text-slate-700/90">
-              <li>
-                •{" "}
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-2">
+            <article className="flex flex-col rounded-[24px] border border-primary/10 bg-white p-6 shadow-sm">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-light/80 text-sapin">
+                  <BagIcon className="h-6 w-6" />
+                </span>
+                <div>
+                  <h3 className="text-lg font-semibold text-ardoise">
+                    {t("Retrait en conciergerie", "Collection at our concierge")}
+                  </h3>
+                  <p className="text-sm text-slate-600">
+                    {t("Arc 1800 ou Arc 2000 · gratuit", "Arc 1800 or Arc 2000 · free")}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-4 text-sm text-slate-700">
                 {t(
-                  `Retrait en magasin : toute la journée, pendant les heures d'ouverture de la conciergerie de votre station (${site.openingHours}).`,
-                  `In-store collection: all day, during the opening hours of your resort's concierge (${site.openingHours}).`,
+                  "Passez quand vous voulez pendant les heures d'ouverture :",
+                  "Drop by any time during opening hours:",
                 )}
-              </li>
-              <li>
-                •{" "}
+              </p>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl bg-sapin p-3 text-white">
+                  <p className="text-sm font-bold">❄ {t("Hiver", "Winter")}</p>
+                  <p className="text-xs text-white/85">{t("7j/7", "7 days a week")}</p>
+                  <p className="mt-1 text-sm font-semibold">
+                    {t("9h–12h · 15h–19h", "9am–12pm · 3pm–7pm")}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-accent p-3 text-ardoise">
+                  <p className="text-sm font-bold">☀ {t("Été", "Summer")}</p>
+                  <p className="text-xs">{t("Mar–dim · fermé lundi", "Tue–Sun · closed Mon")}</p>
+                  <p className="mt-1 text-sm font-semibold">
+                    {t("9h30–12h · 15h30–18h30", "9:30am–12pm · 3:30pm–6:30pm")}
+                  </p>
+                </div>
+              </div>
+            </article>
+
+            <article className="flex flex-col rounded-[24px] border border-primary/10 bg-white p-6 shadow-sm">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-light/80 text-sapin">
+                  <TruckIcon className="h-6 w-6" />
+                </span>
+                <div>
+                  <h3 className="text-lg font-semibold text-ardoise">
+                    {t("Livraison dans votre logement", "Delivery to your accommodation")}
+                  </h3>
+                  <p className="text-sm text-slate-600">
+                    {t("Option à ajouter au panier", "Option added at checkout")}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-3 rounded-xl bg-primary-light/50 p-4">
+                <span className="text-3xl font-bold text-sapin">{site.deliveryWindow}</span>
+              </div>
+              <p className="mt-3 text-sm text-slate-700">
                 {t(
-                  `Livraison : entre ${site.deliveryWindow}, créneau planifié par nos soins.`,
-                  `Delivery: between ${site.deliveryWindow}, time slot scheduled by our team.`,
+                  "Nous planifions le créneau de livraison et vous déposons tout sur place, prêt à l'emploi.",
+                  "We schedule the delivery slot and drop everything off, ready to use.",
                 )}
-              </li>
-              <li>
-                • {t("Besoin d'aide ? Contact :", "Need help? Contact:")}{" "}
-                {SITE.phone}
-              </li>
-            </ul>
+              </p>
+            </article>
+          </div>
+
+          <div className="mt-5 flex flex-col items-start justify-between gap-3 rounded-[20px] border border-primary/10 bg-neige p-4 sm:flex-row sm:items-center">
+            <p className="text-sm font-medium text-ardoise">
+              {t("Une question sur votre commande ?", "A question about your order?")}
+            </p>
+            <a
+              href={SITE.phoneHref}
+              className="inline-flex items-center gap-2 rounded-full bg-sapin px-5 py-2 text-sm font-semibold text-white transition hover:bg-sapin/90"
+            >
+              {t("Appeler le", "Call")} {SITE.phone}
+            </a>
           </div>
         </PageContainer>
       </section>

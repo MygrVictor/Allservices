@@ -14,15 +14,15 @@ export default function HomePage() {
       href: "/proprietaires",
       ctaLabel: t("Découvrir l'accompagnement", "Discover our support"),
       description: t(
-        "Remise de clés, ménage, blanchisserie et état des lieux de sortie pour fluidifier les rotations de locataires.",
-        "Key handover, cleaning, laundry and check-out inspections to keep your tenant turnovers smooth.",
+        "Remise de clés, ménage, blanchisserie et état des lieux de sortie.",
+        "Key handover, cleaning, laundry and check-out inspections.",
       ),
       icon: <KeyIcon className="h-5 w-5" />,
       illustration: (
         <div className="relative h-full w-full overflow-hidden">
           <Image
             src="/services/proprietaire.jpg"
-            alt={t("Propriétaires aux Arcs", "Owners in Les Arcs")}
+            alt={t("Propriétaires sur les Arcs", "Owners in Les Arcs")}
             fill
             sizes="(min-width: 768px) 20rem, 100vw"
             className="object-cover"
@@ -33,16 +33,16 @@ export default function HomePage() {
     {
       title: t("Vacanciers", "Holidaymakers"),
       href: "/vacanciers",
-      ctaLabel: t("Réserver mon séjour", "Book my stay"),
+      ctaLabel: t("Réserver mon linge", "Book my stay"),
       description: t(
-        "Linge, équipement bébé et packs location de ski réservés en quelques clics.",
+        "Location de linge, service de blanchisserie, location de ski réservés en quelques clics.",
         "Linen, baby equipment and ski rental packs booked in a few clicks.",
       ),
       icon: <BedIcon className="h-5 w-5" />,
       illustration: (
         <div className="relative h-full w-full overflow-hidden">
           <Image
-            src="/services/blanchisserie.jpg"
+            src="/background_customer.jpg"
             alt={t("Linge propre et plié", "Clean folded linen")}
             fill
             sizes="(min-width: 768px) 20rem, 100vw"
@@ -64,7 +64,10 @@ export default function HomePage() {
         <div className="relative h-full w-full overflow-hidden">
           <Image
             src="/services/infos-pratiques.jpg"
-            alt={t("Infos pratiques aux Arcs", "Practical info in Les Arcs")}
+            alt={t(
+              "Infos pratiques sur les Arcs",
+              "Practical info in Les Arcs",
+            )}
             fill
             sizes="(min-width: 768px) 20rem, 100vw"
             className="object-cover"
@@ -101,7 +104,7 @@ export default function HomePage() {
             </p>
             <h1 className="mt-4 max-w-3xl text-3xl leading-tight drop-shadow sm:text-5xl">
               {t(
-                "Conciergerie, ménage, blanchisserie et location de linge aux Arcs.",
+                "Conciergerie, ménage, blanchisserie et location de linge sur les Arcs.",
                 "Concierge, cleaning, laundry service and linen rental in Les Arcs.",
               )}
             </h1>
@@ -120,7 +123,7 @@ export default function HomePage() {
                 <p className="text-lg font-bold">
                   {standby
                     ? t("Demander un devis", "Request a quote")
-                    : t("Réserver en ligne", "Book online")}
+                    : t("Réserver mon linge en ligne", "Book my linen online")}
                 </p>
                 <p className="mt-1 text-sm">
                   {standby
@@ -129,8 +132,8 @@ export default function HomePage() {
                         "Online payment is disabled off-season.",
                       )
                     : t(
-                        "Location de Linge et de skis.",
-                        "Linen and ski rental.",
+                        "Priorité au linge, avec option location de skis.",
+                        "Linen first, with optional ski rental.",
                       )}
                 </p>
               </Link>
@@ -143,8 +146,8 @@ export default function HomePage() {
                 </p>
                 <p className="mt-1 text-sm text-slate-700">
                   {t(
-                    "Linge, bébé, location de ski.",
-                    "Linen, baby, ski rental.",
+                    "Location de linge, Blanchisserie, location de skis.",
+                    "Linen rental, laundry service, ski rental.",
                   )}
                 </p>
               </Link>
@@ -181,7 +184,7 @@ export default function HomePage() {
             </h2>
             <p className="mt-3 text-base text-slate-600 sm:text-lg">
               {t(
-                "Conciergerie, ménage, blanchisserie, location de linge, ski et informations pratiques : tout est réuni pour préparer un séjour fluide aux Arcs.",
+                "Conciergerie, ménage, blanchisserie, location de linge, ski et informations pratiques : tout est réuni pour préparer un séjour fluide sur les Arcs.",
                 "Concierge, cleaning, laundry service, linen and ski rental, practical information: everything you need for a smooth stay in Les Arcs.",
               )}
             </p>
@@ -243,7 +246,7 @@ export default function HomePage() {
               {t("Partenaires", "Partners")}
             </h2>
             <ul className="grid flex-1 gap-3 text-sm sm:grid-cols-2">
-              <li className="flex items-center gap-3 rounded-lg bg-white/90 p-3">
+              <li className="flex items-center gap-3 rounded-lg bg-white/95 p-3 shadow-sm ring-1 ring-primary/10">
                 <Image
                   src="/partners/skiset.png"
                   alt="Skiset"
@@ -253,20 +256,18 @@ export default function HomePage() {
                 />
                 <span>
                   {t(
-                    "Réduction location de ski en magasin + remise web.",
-                    "Ski rental discount in store + online discount.",
+                    "Code réduction Skiset sur demande (magasin + web).",
+                    "Skiset discount code on request (in-store + web).",
                   )}{" "}
-                  <a
-                    href="https://www.my-ski.fr/fr/location-ski-station/Arc-1800/All-Services-Montagne/All-Services-Montagne"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    href="/contact?sujet=code-reduction-skiset"
                     className="font-semibold underline"
                   >
-                    {t("Voir l'offre", "See the offer")}
-                  </a>
+                    {t("Découvrir le code", "Request the code")}
+                  </Link>
                 </span>
               </li>
-              <li className="flex items-center gap-3 rounded-lg bg-white/90 p-3">
+              <li className="flex items-center gap-3 rounded-lg bg-white/95 p-3 shadow-sm ring-1 ring-primary/10">
                 <Image
                   src="/partners/esf.png"
                   alt="ESF Arc 1800"
@@ -276,17 +277,15 @@ export default function HomePage() {
                 />
                 <span>
                   {t(
-                    "Réduction cours collectifs ESF Arc 1800 (code sur demande).",
-                    "Discount on ESF Arc 1800 group lessons (code on request).",
+                    "10% sur les cours collectifs ESF Arc 1800 (code sur demande).",
+                    "10% off ESF Arc 1800 group lessons (code on request).",
                   )}{" "}
-                  <a
-                    href="https://www.esf-arc-1800.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    href="/contact?sujet=code-reduction-esf"
                     className="font-semibold underline"
                   >
-                    {t("Site ESF", "ESF website")}
-                  </a>
+                    {t("Demander le code", "Request the code")}
+                  </Link>
                 </span>
               </li>
             </ul>
@@ -334,7 +333,7 @@ export default function HomePage() {
       <section id="nos-agences" className="scroll-mt-20 py-12">
         <PageContainer>
           <h2 className="text-3xl text-ardoise">
-            {t("Nos agences aux Arcs", "Our offices in Les Arcs")}
+            {t("Nos agences sur les Arcs", "Our offices in Les Arcs")}
           </h2>
           <p className="mt-2 max-w-2xl text-slate-700">
             {t(
@@ -343,7 +342,7 @@ export default function HomePage() {
             )}
           </p>
           <div className="mt-6">
-            <StationCards />
+            <StationCards linkToLaundryPage />
           </div>
         </PageContainer>
       </section>

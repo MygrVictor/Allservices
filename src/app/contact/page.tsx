@@ -28,7 +28,7 @@ export default function ContactPage({
               <Image
                 src="/hero/arc-1800.jpg"
                 alt={t(
-                  "Paysage de montagne aux Arcs",
+                  "Paysage de montagne sur les Arcs",
                   "Mountain landscape in Les Arcs",
                 )}
                 fill
@@ -44,7 +44,7 @@ export default function ContactPage({
               </h1>
               <p className="mt-2 max-w-xl text-sm text-white/90 sm:text-base">
                 {t(
-                  "Une équipe locale basée aux Arcs 1800 et 2000 pour répondre rapidement à vos demandes.",
+                  "Une équipe locale basée sur les Arcs 1800 et 2000 pour répondre rapidement à vos demandes.",
                   "A local team based in Les Arcs 1800 and 2000, ready to answer your requests quickly.",
                 )}
               </p>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { LanguageSwitch } from "@/components/language-switch";
+import { NavDropdown, NavLink } from "@/components/nav-link";
 import { getT } from "@/lib/i18n-server";
 
 export function SiteHeader() {
@@ -26,7 +27,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-primary-dark bg-primary text-white shadow-md">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-3 py-2 sm:gap-3 sm:px-4 sm:py-2.5">
+      <div className="mx-auto flex w-full max-w-[1400px] items-center gap-2 px-2 py-2 sm:gap-3 sm:px-4 sm:py-2.5 lg:px-5">
         <Link
           href="/"
           className="flex shrink-0 items-center gap-2 rounded-lg bg-white/95 px-1.5 py-0.5 sm:gap-3 sm:px-2 sm:py-1"
@@ -45,55 +46,30 @@ export function SiteHeader() {
         </Link>
         <nav
           aria-label={t("Navigation principale", "Main navigation")}
-          className="hidden gap-4 text-sm font-medium lg:flex xl:gap-6"
+          className="hidden flex-1 items-center justify-center gap-1 text-sm font-medium lg:flex xl:gap-2"
         >
           {mainLinks.map((link) =>
             link.isDropdown ? (
-              <details key="vacanciers" className="group relative">
-                <summary className="flex cursor-pointer items-center gap-1 text-white/90 transition hover:text-accent marker:content-none">
-                  {link.label}
-                  <svg
-                    className="h-4 w-4 transition group-open:rotate-180"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M19 8l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <ul className="absolute top-full left-0 mt-2 w-56 rounded-panel border border-slate-200 bg-white text-ardoise shadow-lg p-1">
-                  {vacancierSublinks.map((sublink) => (
-                    <li key={sublink.href}>
-                      <Link
-                        href={sublink.href}
-                        className="block rounded-lg px-3 py-2 text-base font-medium transition hover:bg-primary-light"
-                      >
-                        {sublink.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </details>
+              <NavDropdown
+                key="vacanciers"
+                label={link.label}
+                items={vacancierSublinks}
+              />
             ) : (
-              <Link
-                key={link.href!}
-                href={link.href!}
-                className="text-white/90 transition hover:text-accent"
-              >
+              <NavLink key={link.href!} href={link.href!}>
                 {link.label}
-              </Link>
+              </NavLink>
             ),
           )}
         </nav>
-        <div className="flex items-center gap-1 sm:gap-2">
-          <LanguageSwitch className="hidden sm:inline-flex" />
+        <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:ml-0">
           <Link
             href="/vacanciers"
             className="hidden lg:inline-flex items-center rounded-full bg-accent px-3 py-1.5 text-xs font-bold text-ardoise shadow-lg ring-2 ring-white/70 transition hover:bg-accent-dark sm:px-4 sm:py-2 sm:text-sm"
           >
-            {t("Réserver en ligne", "Book online")}
+            {t("Réserver mon linge", "Book linen")}
           </Link>
+          <LanguageSwitch className="hidden sm:inline-flex lg:ml-2" />
           <details className="relative lg:hidden">
             <summary
               className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-white/40 marker:content-none sm:h-10 sm:w-10"

@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     default: "All Services Montagne",
     template: "%s | All Services Montagne",
   },
-  description: "Conciergerie et laverie aux Arcs 1800 et 2000",
+  description: "Conciergerie et laverie sur les Arcs 1800 et 2000",
   applicationName: "All Services Montagne",
   alternates: {
     canonical: "/",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     siteName: "All Services Montagne",
     title: "All Services Montagne",
     description:
-      "Conciergerie, laverie et location de linge & ski aux Arcs 1800 et 2000.",
+      "Conciergerie, laverie et location de linge & ski sur les Arcs 1800 et 2000.",
     images: [
       {
         url: "/brand/logo-allservices.png",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "All Services Montagne",
     description:
-      "Conciergerie, laverie et location de linge & ski aux Arcs 1800 et 2000.",
+      "Conciergerie, laverie et location de linge & ski sur les Arcs 1800 et 2000.",
     images: ["/brand/logo-allservices.png"],
   },
 };

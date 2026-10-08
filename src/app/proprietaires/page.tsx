@@ -12,27 +12,28 @@ export default function ProprietairesPage() {
   productsForAudience("proprietaire").map((p) => localizeProduct(p, locale));
   const steps = [
     {
-      title: t("Vous nous contactez", "You contact us"),
+      title: t("Premier contact", "First contact"),
       description: t(
-        "Via le formulaire de contact : résidence (Arc 1800/2000), contraintes d'arrivée et consignes d'accueil.",
-        "Via the contact form: residence (Arc 1800/2000), arrival constraints and welcome instructions.",
+        "Vous remplissez le formulaire de contact en quelques lignes : votre logement, sa station (Arc 1800 ou Arc 2000) et vos disponibilités.",
+        "Fill in the contact form in a few lines: your property, its resort (Arc 1800 or Arc 2000) and your availability.",
+      ),
+      cta: { href: "/contact?sujet=proprietaire", label: t("Remplir le formulaire", "Fill in the form") },
+    },
+    {
+      title: t("On échange sur vos besoins", "We discuss your needs"),
+      description: t(
+        "Nous vous rappelons pour définir ensemble les prestations utiles et le rythme des rotations.",
+        "We call you back to define together the right services and turnover rhythm.",
       ),
     },
     {
-      title: t("Validation et planning", "Approval and schedule"),
+      title: t("On s'occupe de tout sur place", "We handle everything on site"),
       description: t(
-        "Une fois votre compte propriétaire validé, vous recevez par mail le lien de votre planning.",
-        "Once your owner account is approved, you receive the link to your schedule by email.",
+        "Remise des clés, ménage, linge propre et état des lieux de sortie, selon les prestations choisies.",
+        "Key handover, cleaning, fresh linen and check-out inspection, according to the services you chose.",
       ),
     },
-    {
-      title: t("Exécution sur place", "On-site service"),
-      description: t(
-        "Accueil des locataires et remise des clés, ménage complet du logement, linge de lit et de toilette propre (blanchisserie), état des lieux de sortie : tout est pris en charge selon les prestations choisies.",
-        "Guest welcome and key handover, full cleaning of the property, fresh bed and bath linen (laundry service), check-out inspection: everything is handled according to the services you choose.",
-      ),
-    },
-  ];
+  ] as { title: string; description: string; cta?: { href: string; label: string } }[];
 
   const ownerServices = [
     {
@@ -53,8 +54,8 @@ export default function ProprietairesPage() {
         "Guest welcome + key handover + check-out inspection",
       ),
       description: t(
-        "Accueil des locataires, remise des clés et état des lieux de sortie en leur présence.",
-        "Welcoming tenants, key handover and check-out inspection in their presence.",
+        "Remise des clés et état des lieux de sortie en leur présence.",
+        "Key handover and check-out inspection in their presence.",
       ),
       photo: "/services/etat-des-lieux.jpg",
       icon: <ClipboardIcon className="h-4 w-4" />,
@@ -85,7 +86,7 @@ export default function ProprietairesPage() {
   const highlights = [
     {
       label: t(
-        `${SITE.yearsInBusiness} ans d'implantation aux Arcs 1800 et 2000`,
+        `${SITE.yearsInBusiness} ans d'implantation sur les Arcs 1800 et 2000`,
         `${SITE.yearsInBusiness} years established in Les Arcs 1800 and 2000`,
       ),
       icon: <MapPinIcon className="h-5 w-5" />,
@@ -120,34 +121,16 @@ export default function ProprietairesPage() {
               </p>
               <h1 className="mt-3 max-w-4xl text-4xl leading-tight text-ardoise sm:text-5xl">
                 {t(
-                  "Simplifiez vos rotations locatives aux Arcs avec une conciergerie fiable, locale et réactive.",
+                  "Simplifiez vos rotations locatives sur les Arcs avec une conciergerie fiable, locale et réactive.",
                   "Simplify your rental turnovers in Les Arcs with a reliable, local and responsive concierge.",
                 )}
               </h1>
               <p className="mt-5 max-w-3xl text-lg text-slate-700">
                 {t(
-                  "Nous prenons en charge les temps clés de vos locations saisonnières : accueil des locataires, remises de clés, ménage, blanchisserie du linge et états des lieux. Vous gagnez du temps, sans gérer de plateforme compliquée.",
-                  "We take care of the key moments of your holiday lets: welcoming tenants, key handovers, cleaning, linen laundry and inspections. You save time, without managing a complicated platform.",
+                  "Nous prenons en charge les temps clés de vos locations saisonnières : remises de clés, ménage, blanchisserie du linge et états des lieux. Vous gagnez du temps, sans gérer de plateforme compliquée.",
+                  "We take care of the key moments of your holiday lets: key handovers, cleaning, linen laundry and inspections. You save time, without managing a complicated platform.",
                 )}
               </p>
-
-              <div className="mt-7 grid gap-4 sm:grid-cols-3">
-                {highlights.map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-[22px] border border-primary/10 bg-white px-4 py-4 text-ardoise shadow-sm"
-                  >
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-light/80 text-sapin ring-1 ring-primary/10">
-                        {item.icon}
-                      </span>
-                      <span className="text-sm font-semibold leading-6 text-ardoise">
-                        {item.label}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
@@ -170,7 +153,7 @@ export default function ProprietairesPage() {
                 <Image
                   src="/services/proprietaire.jpg"
                   alt={t(
-                    "Service conciergerie pour propriétaires aux Arcs",
+                    "Service conciergerie pour propriétaires sur les Arcs",
                     "Concierge service for owners in Les Arcs",
                   )}
                   fill
@@ -180,22 +163,21 @@ export default function ProprietairesPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/45 via-transparent to-transparent" />
               </div>
-              <div className="absolute inset-x-4 bottom-4 rounded-[22px] border border-white/25 bg-white/92 p-4 shadow-lg backdrop-blur-sm">
-                <p className="text-sm font-semibold text-ardoise">
-                  {t(
-                    "Présents aux Arcs 1800 & 2000",
-                    "Based in Les Arcs 1800 & 2000",
-                  )}
-                </p>
-                <p className="mt-1 text-sm text-slate-700">
-                  {t(
-                    `${SITE.yearsInBusiness} ans d'implantation, entreprise familiale et réactivité 7j/7 en saison.`,
-                    `${SITE.yearsInBusiness} years established, family business, available 7 days a week in season.`,
-                  )}
-                </p>
-              </div>
             </div>
           </div>
+
+          <ul className="mt-10 grid divide-y divide-primary/10 overflow-hidden rounded-[24px] border border-primary/10 bg-white shadow-soft sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+            {highlights.map((item) => (
+              <li key={item.label} className="flex items-center gap-4 px-5 py-5">
+                <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-light/80 text-sapin ring-1 ring-primary/10">
+                  {item.icon}
+                </span>
+                <span className="text-sm font-semibold leading-6 text-ardoise">
+                  {item.label}
+                </span>
+              </li>
+            ))}
+          </ul>
         </PageContainer>
       </section>
 
@@ -213,45 +195,45 @@ export default function ProprietairesPage() {
             </h2>
           </div>
 
-          <ol className="grid gap-4 md:grid-cols-3">
+          <ol className="relative grid gap-5 md:grid-cols-3">
+            <span
+              aria-hidden
+              className="absolute left-[16.66%] right-[16.66%] top-7 hidden h-0.5 bg-gradient-to-r from-sapin via-primary to-accent md:block"
+            />
             {steps.map((step, index) => (
               <li
                 key={step.title}
-                className={`relative flex flex-col overflow-hidden rounded-[26px] p-6 shadow-sm ${
-                  index === 0
-                    ? "md:col-span-2"
-                    : index === 2
-                      ? "md:col-span-3"
-                      : ""
-                } ${
-                  index === 0
-                    ? "bg-sapin text-white"
-                    : index === 2
-                      ? "bg-accent text-ardoise"
-                      : "border border-primary/10 bg-primary-light/40 text-ardoise"
-                }`}
+                className="relative flex flex-col items-center rounded-[24px] border border-primary/10 bg-white p-6 pt-0 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg md:border-0 md:bg-transparent md:shadow-none md:hover:translate-y-0 md:hover:shadow-none"
               >
                 <span
-                  aria-hidden
-                  className="pointer-events-none absolute -right-2 -top-6 text-[7rem] font-bold leading-none opacity-15"
+                  className={`relative z-10 -mt-0 inline-flex h-14 w-14 items-center justify-center rounded-full text-xl font-bold shadow-lg ring-4 ring-white ${
+                    index === 0
+                      ? "bg-sapin text-white"
+                      : index === 1
+                        ? "bg-primary text-white"
+                        : "bg-accent text-ardoise"
+                  }`}
                 >
                   {index + 1}
                 </span>
-                <span
-                  className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${
-                    index === 0 ? "bg-white/20" : "bg-white/70"
-                  }`}
-                >
+                <span className="mt-4 text-xs font-bold uppercase tracking-wide text-sapin">
                   {t("Étape", "Step")} {index + 1}
                 </span>
-                <h3 className="mt-4 text-xl font-semibold">{step.title}</h3>
-                <p
-                  className={`mt-2 text-sm leading-6 ${
-                    index === 0 ? "text-white/90" : "text-slate-700"
-                  }`}
-                >
+                <h3 className="mt-1 text-xl font-semibold text-ardoise">
+                  {step.title}
+                </h3>
+                <p className="mt-2 max-w-xs text-sm leading-6 text-slate-700">
                   {step.description}
                 </p>
+                {step.cta && (
+                  <Link
+                    href={step.cta.href}
+                    className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-sapin px-4 py-2 text-sm font-semibold text-white transition hover:bg-sapin/90"
+                  >
+                    {step.cta.label}
+                    <span aria-hidden>→</span>
+                  </Link>
+                )}
               </li>
             ))}
           </ol>
@@ -262,84 +244,79 @@ export default function ProprietairesPage() {
         <PageContainer>
           <div className="grid gap-6">
             <div className="space-y-6">
-              <div className="rounded-panel border border-primary/10 bg-white p-6 shadow-soft">
-                <p className="text-sm font-semibold tracking-wide text-sapin">
-                  {t("Nos prestations", "Our services")}
-                </p>
-                <h2 className="mt-2 text-3xl text-ardoise">
-                  {t(
-                    "Des prestations claires, adaptées à la saison",
-                    "Clear services, tailored to the season",
-                  )}
-                </h2>
-                <p className="mt-3 rounded-lg border border-primary/20 bg-primary-light/75 p-3 text-sm text-ardoise">
-                  {t(
-                    "Les prestations propriétaires ne se commandent pas en ligne :",
-                    "Owner services cannot be ordered online:",
-                  )}{" "}
+              <div className="rounded-panel border border-primary/10 bg-white p-6 shadow-soft sm:p-8">
+                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                  <div className="max-w-2xl">
+                    <p className="text-sm font-semibold tracking-wide text-sapin">
+                      {t("Nos prestations", "Our services")}
+                    </p>
+                    <h2 className="mt-2 text-3xl text-ardoise">
+                      {t(
+                        "Des prestations claires, adaptées à la saison",
+                        "Clear services, tailored to the season",
+                      )}
+                    </h2>
+                    <p className="mt-2 text-sm text-slate-700">
+                      {t(
+                        "Choisissez une ou plusieurs prestations : nous construisons un devis adapté à votre logement.",
+                        "Pick one or more services: we build a quote tailored to your property.",
+                      )}
+                    </p>
+                  </div>
                   <Link
                     href="/contact?sujet=proprietaire"
-                    className="font-semibold underline"
+                    className="inline-flex shrink-0 items-center gap-2 self-start rounded-full bg-sapin px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sapin/90 md:self-auto"
                   >
-                    {t("contactez-nous", "contact us")}
+                    {t("Demander un devis", "Request a quote")}
+                    <span aria-hidden>→</span>
                   </Link>
-                  {t(
-                    ". Après validation, le lien vers votre planning vous est envoyé par mail.",
-                    ". Once approved, the link to your schedule is sent to you by email.",
-                  )}
-                </p>
-              </div>
+                </div>
 
-              <div className="rounded-panel border border-primary/10 bg-white p-6 shadow-soft">
-                <h2 className="flex items-center gap-2 text-2xl text-ardoise">
-                  <span className="inline-flex rounded-full bg-primary-light/70 p-2 text-sapin">
-                    <BriefcaseIcon className="h-5 w-5" />
-                  </span>
-                  {t("Prestations disponibles", "Available services")}
-                </h2>
-                <p className="mt-2 text-sm text-slate-700">
-                  {t(
-                    "Des prestations complètes, adaptées aux besoins des propriétaires en saison.",
-                    "Complete services, tailored to owners' needs during the season.",
-                  )}
-                </p>
-
-                <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  {ownerServices.map((service) => (
+                <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                  {ownerServices.map((service, index) => (
                     <article
                       key={service.title}
-                      className="overflow-hidden rounded-panel border border-primary/10 bg-primary-light/20"
+                      className="group flex flex-col overflow-hidden rounded-[22px] border border-primary/10 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl"
                     >
-                      {service.photo && (
-                        <Image
-                          src={service.photo}
-                          alt={service.title}
-                          width={672}
-                          height={504}
-                          sizes="(min-width: 640px) 21rem, 100vw"
-                          className="h-auto w-full"
-                        />
-                      )}
-                      <div className="p-4">
-                        <div className="flex items-start gap-2.5">
-                          <span className="mt-0.5 inline-flex rounded-full bg-primary-light/60 p-1.5 text-sapin">
-                            {service.icon}
-                          </span>
-                          <h3 className="text-lg font-semibold text-ardoise">
-                            {service.title}
-                          </h3>
-                        </div>
-                        <p className="mt-2 text-sm text-slate-700/90">
+                      <div className="relative aspect-[4/3] w-full overflow-hidden bg-primary-light/50">
+                        {service.photo ? (
+                          <Image
+                            src={service.photo}
+                            alt={service.title}
+                            fill
+                            sizes="(min-width: 1024px) 18rem, (min-width: 640px) 50vw, 100vw"
+                            className="object-cover transition duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-sapin">
+                            <SparkleIcon className="h-12 w-12" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                        <span className="absolute left-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-sm font-bold text-sapin shadow">
+                          {index + 1}
+                        </span>
+                        <span className="absolute bottom-3 left-3 inline-flex rounded-full bg-white/95 p-2 text-sapin shadow">
+                          {service.icon}
+                        </span>
+                      </div>
+                      <div className="flex flex-1 flex-col p-4">
+                        <h3 className="text-base font-semibold leading-snug text-ardoise">
+                          {service.title}
+                        </h3>
+                        <p className="mt-2 flex-1 text-sm leading-6 text-slate-600">
                           {service.description}
                         </p>
                       </div>
                     </article>
                   ))}
                 </div>
-                <p className="mt-4 text-sm text-slate-600">
+
+                <p className="mt-6 flex items-center gap-2 rounded-lg border border-primary/15 bg-primary-light/50 px-4 py-3 text-sm text-ardoise">
+                  <BriefcaseIcon className="h-4 w-4 shrink-0 text-sapin" />
                   {t(
-                    "Tarifs sur demande, selon votre logement et vos besoins.",
-                    "Prices on request, depending on your property and needs.",
+                    "Tarifs sur devis, selon votre logement et vos besoins.",
+                    "Prices on quote, depending on your property and needs.",
                   )}
                 </p>
               </div>
@@ -390,41 +367,64 @@ export default function ProprietairesPage() {
 
       <section className="pb-14">
         <PageContainer>
-          <div className="grid gap-6">
-            <article className="rounded-panel border border-primary/10 bg-white p-6 shadow-soft">
-              <h2 className="flex items-center gap-2 text-2xl text-ardoise">
-                <span className="inline-flex rounded-full bg-primary-light/70 p-2 text-sapin">
-                  <MapPinIcon className="h-5 w-5" />
-                </span>
-                {t("Zone desservie", "Service area")}
-              </h2>
-              <p className="mt-2 text-slate-700/90">
-                {t(
-                  "Nous intervenons sur Arc 1800 et Arc 2000, avec un ancrage local pour faciliter les arrivées et départs de vos locataires.",
-                  "We operate in Arc 1800 and Arc 2000, with a local presence to make your tenants' arrivals and departures easier.",
-                )}
-              </p>
-              <ul className="mt-4 space-y-2 text-sm text-slate-700/90">
-                <li>
-                  •{" "}
+          <div className="relative overflow-hidden rounded-[28px] bg-sapin px-6 py-8 text-white shadow-xl sm:px-10 sm:py-10">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -bottom-20 right-24 h-40 w-40 rounded-full bg-accent/20"
+            />
+            <div className="relative grid gap-6 md:grid-cols-[1.4fr_1fr] md:items-center">
+              <div>
+                <p className="inline-flex items-center gap-2 text-sm font-semibold tracking-wide text-accent">
+                  <MapPinIcon className="h-4 w-4" />
+                  {t("Zone desservie", "Service area")}
+                </p>
+                <h2 className="mt-2 text-2xl leading-tight sm:text-3xl">
                   {t(
-                    "Arc 1800 : galerie du Charvet en bas de la Poste",
-                    "Arc 1800: Galerie du Charvet below the Post Office",
+                    "Votre logement est sur les Arc 1800 ou les Arc 2000 ?",
+                    "Is your property in Arc 1800 or Arc 2000?",
                   )}
-                </li>
-                <li>
-                  •{" "}
+                </h2>
+                <p className="mt-3 max-w-xl text-white/85">
                   {t(
-                    "Arc 2000 : place haute, en face de Skiset",
-                    "Arc 2000: upper square, opposite Skiset",
+                    "Avec un ancrage local dans les deux stations, nous facilitons les arrivées et départs de vos locataires.",
+                    "With a local presence in both resorts, we make your tenants' arrivals and departures easier.",
                   )}
-                </li>
-                <li>
-                  • Contact : {SITE.phone} —{" "}
-                  {t("réactifs 7j/7", "available 7 days a week")}
-                </li>
-              </ul>
-            </article>
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {["Arc 1800", "Arc 2000"].map((name) => (
+                    <span
+                      key={name}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-sm font-semibold"
+                    >
+                      <MapPinIcon className="h-3.5 w-3.5 text-accent" />
+                      {name}
+                    </span>
+                  ))}
+                  <span className="inline-flex items-center rounded-full border border-white/25 bg-white/10 px-3 py-1 text-sm font-semibold">
+                    {t("Réactifs 7j/7 en saison", "Available 7 days a week in season")}
+                  </span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-3 md:items-end">
+                <Link
+                  href="/contact?sujet=proprietaire"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-ardoise shadow-lg transition hover:bg-accent-dark md:w-auto"
+                >
+                  {t("Demander un devis", "Request a quote")}
+                  <span aria-hidden>→</span>
+                </Link>
+                <a
+                  href={SITE.phoneHref}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10 md:w-auto"
+                >
+                  {t("Appeler le", "Call")} {SITE.phone}
+                </a>
+              </div>
+            </div>
           </div>
         </PageContainer>
       </section>

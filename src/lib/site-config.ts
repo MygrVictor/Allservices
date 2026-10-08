@@ -37,8 +37,8 @@ export const STATIONS: Station[] = [
       "Dans la galerie commerciale, en bas de la Poste. Accès piéton depuis le centre Charvet.",
     services: [
       "Conciergerie (remise de clés, états des lieux)",
+      "Blanchisserie : déposez votre linge, on le lave pour vous",
       "Location de linge & équipement bébé",
-      "Packs location de ski (partenaire Skiset)",
     ],
     photo: "/stations/arc1800/plan.jpg",
     mapsUrl:
@@ -93,6 +93,7 @@ const STATIONS_EN: Record<
       "In the shopping arcade, below the Post Office. Pedestrian access from the Charvet centre.",
     services: [
       "Concierge (key handover, check-out inspections)",
+      "Laundry service: drop off your laundry, we wash it for you",
       "Linen & baby equipment rental",
       "Ski rental packs (Skiset partner)",
     ],

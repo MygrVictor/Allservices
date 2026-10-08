@@ -36,7 +36,7 @@ export type PaymentWebhookEvent =
   | { type: "ignored" };
 
 export interface PaymentProvider {
-  readonly id: "stripe" | "payplug";
+  readonly id: "stripe" | "payplug" | "systempay";
   isConfigured(): boolean;
   createCheckout(input: CreateCheckoutInput): Promise<CreateCheckoutResult>;
   /** Doit lever une erreur si la requête n'est pas authentique. */

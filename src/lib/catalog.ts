@@ -36,7 +36,7 @@ export const PRODUCTS: CatalogProduct[] = [
     code: "accueil-clefs-illimite",
     name: "Accueil et remise de clefs illimité en saison",
     description:
-      "Accueil des locataires et coordination des remises de clés pendant la saison.",
+      "Remises de clés pendant la saison.",
     priceCents: 38000,
     targetAudience: "proprietaire",
     category: "remise_cles",

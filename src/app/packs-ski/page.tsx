@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { PageContainer } from "@/components/page-container";
-import { SkiersIllustration } from "@/components/illustrations";
 import { SiteCart } from "@/components/site-cart";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import {
@@ -35,9 +34,21 @@ export default function PacksSkiPage() {
 
   return (
     <>
-      <section className="bg-gradient-to-b from-primary via-primary-light to-accent/10">
+      <section className="relative isolate overflow-hidden">
+        <Image
+          src="/services/vacancier.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="-z-20 object-cover object-center"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-gradient-to-r from-primary-dark/85 via-primary-dark/55 to-transparent"
+        />
         <PageContainer>
-          <div className="grid gap-6 py-12 sm:py-16 lg:grid-cols-[1.3fr_1fr] lg:items-center">
+          <div className="max-w-2xl py-14 sm:py-20">
             <div>
               <p className="text-sm font-semibold tracking-wide text-white/90">
                 {t(
@@ -64,7 +75,6 @@ export default function PacksSkiPage() {
                 {t("Réserver mon pack ski", "Book my ski pack")}
               </Link>
             </div>
-            <SkiersIllustration className="h-48 w-full" />
           </div>
         </PageContainer>
       </section>
@@ -142,40 +152,75 @@ export default function PacksSkiPage() {
             })}
           </div>
 
-          <div className="mt-8 rounded-panel border-2 border-accent/50 bg-gradient-to-br from-accent/15 to-accent/5 p-5 text-ardoise">
-            <h2 className="text-xl font-bold">
+          <div className="mt-12">
+            <h2 className="text-2xl text-ardoise sm:text-3xl">
               {t("Comment ça marche ?", "How does it work?")}
             </h2>
-            <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm">
-              <li>
-                {t(
-                  "Choisissez votre station et vos packs (adulte / enfant).",
-                  "Choose your resort and your packs (adult / child).",
-                )}
-              </li>
-              <li>
-                {t(
-                  "Payez en ligne, sans créer de compte.",
-                  "Pay online, no account needed.",
-                )}
-              </li>
-              <li>
-                {t(
-                  "Téléchargez votre bon (aussi envoyé par mail) et présentez-le au magasin.",
-                  "Download your voucher (also emailed) and show it at the shop.",
-                )}
-              </li>
+            <ol className="mt-6 grid gap-4 md:grid-cols-3">
+              {[
+                {
+                  icon: "⛷",
+                  title: t("Choisissez", "Choose"),
+                  text: t(
+                    "Votre station et vos packs adulte / enfant.",
+                    "Your resort and your adult / child packs.",
+                  ),
+                },
+                {
+                  icon: "💳",
+                  title: t("Payez en ligne", "Pay online"),
+                  text: t(
+                    "Paiement sécurisé.",
+                    "Secure payment.",
+                  ),
+                },
+                {
+                  icon: "🎟",
+                  title: t("Présentez votre bon", "Show your voucher"),
+                  text: t(
+                    "Téléchargez-le (aussi envoyé par mail) et présentez-le au magasin.",
+                    "Download it (also emailed) and show it at the shop.",
+                  ),
+                },
+              ].map((step, i) => (
+                <li
+                  key={step.title}
+                  className="relative overflow-hidden rounded-[22px] border border-primary/10 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                >
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute -right-2 -top-4 text-[5.5rem] font-bold leading-none text-primary/10"
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-accent/20 text-2xl">
+                    {step.icon}
+                  </span>
+                  <h3 className="mt-3 text-lg font-semibold text-ardoise">
+                    <span className="text-accent-dark">{i + 1}.</span>{" "}
+                    {step.title}
+                  </h3>
+                  <p className="mt-1 text-sm leading-6 text-slate-700">
+                    {step.text}
+                  </p>
+                </li>
+              ))}
             </ol>
-            <p className="mt-3 text-sm">
-              {t("Une question ?", "Any questions?")}{" "}
+            <div className="mt-5 flex flex-col items-start justify-between gap-3 rounded-[20px] border border-primary/10 bg-neige p-4 sm:flex-row sm:items-center">
+              <p className="text-sm font-medium text-ardoise">
+                {t(
+                  "Une question sur les packs ski ?",
+                  "A question about ski packs?",
+                )}
+              </p>
               <Link
                 href="/contact?sujet=ski"
-                className="font-semibold text-accent hover:text-accent-dark underline"
+                className="inline-flex items-center gap-2 rounded-full bg-sapin px-5 py-2 text-sm font-semibold text-white transition hover:bg-sapin/90"
               >
                 {t("Contactez-nous", "Contact us")}
+                <span aria-hidden>→</span>
               </Link>
-              .
-            </p>
+            </div>
           </div>
         </PageContainer>
       </section>

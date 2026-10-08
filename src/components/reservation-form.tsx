@@ -488,7 +488,7 @@ export function ReservationForm({
                         key={product.code}
                         className={cn(
                           "flex items-center justify-between gap-3 rounded-panel border border-slate-200 p-3",
-                          isSkiPack ? "opacity-50" : "",
+                          isSkiPack ? "border-indigo-300 bg-indigo-50/60" : "",
                         )}
                       >
                         <div className="min-w-0">
