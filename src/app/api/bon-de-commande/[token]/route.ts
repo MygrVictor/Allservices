@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BookingStatus } from "@prisma/client";
-import { buildOrderPdf, loadOrderForPdf } from "@/lib/orders";
+import {
+  buildOrderPdf,
+  loadOrderForPdf,
+  orderPdfFilename,
+  parseOrderPdfKind,
+} from "@/lib/orders";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /** Téléchargement du bon de commande (sans compte : accès par jeton secret). */
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { token: string } },
 ) {
   if (!/^[a-z0-9]{20,40}$/i.test(params.token)) {
@@ -22,11 +27,12 @@ export async function GET(
     );
   }
 
-  const pdf = await buildOrderPdf(booking);
+  const kind = parseOrderPdfKind(request.nextUrl.searchParams.get("type"));
+  const pdf = await buildOrderPdf(booking, kind);
   return new NextResponse(Buffer.from(pdf), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="bon-de-commande-${booking.id}.pdf"`,
+      "Content-Disposition": `attachment; filename="${orderPdfFilename(booking.id, kind)}"`,
       "Cache-Control": "private, no-store",
     },
   });

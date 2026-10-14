@@ -34,3 +34,32 @@ h3,
 h4 {
   font-family: var(--font-heading), serif;
 }
+
+/* Titres des bandeaux (hero) : plus fins et élégants */
+h1.hero-title {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 1.05rem + 1.7vw, 2.6rem);
+  line-height: 1.18;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+/* Petit texte sous le titre hero */
+h1.hero-title + p {
+  font-family: var(--font-body), sans-serif;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: 0.005em;
+  opacity: 0.92;
+  text-wrap: pretty;
+}
+
+/* Sur-titre (petite étiquette au-dessus du titre hero) */
+:has(+ h1.hero-title) {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}

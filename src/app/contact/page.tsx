@@ -39,9 +39,7 @@ export default function ContactPage({
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/90">
                 All Services Montagne
               </p>
-              <h1 className="mt-2 text-3xl leading-tight sm:text-4xl">
-                Contact
-              </h1>
+              <h1 className="hero-title mt-2">Contact</h1>
               <p className="mt-2 max-w-xl text-sm text-white/90 sm:text-base">
                 {t(
                   "Une équipe locale basée sur les Arcs 1800 et 2000 pour répondre rapidement à vos demandes.",

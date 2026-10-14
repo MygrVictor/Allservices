@@ -84,6 +84,13 @@ export function SiteFooter() {
             {t("Mentions légales", "Legal notice")}
           </Link>
           <Link
+            href="/cgv"
+            className="inline-flex items-center gap-2 hover:text-ardoise"
+          >
+            <ChevronIcon className="h-4 w-4 text-sapin" />
+            {t("Conditions générales de vente", "Terms of sale")}
+          </Link>
+          <Link
             href="/vacanciers"
             className="inline-flex items-center gap-2 hover:text-ardoise"
           >
@@ -104,6 +111,13 @@ export function SiteFooter() {
             <ChevronIcon className="h-4 w-4 text-sapin" />
             {t("Nous contacter", "Contact us")}
           </Link>
+          <Link
+            href="/espace-pro"
+            className="mt-2 inline-flex items-center gap-2 border-t border-slate-100 pt-2 text-xs text-slate-500 hover:text-ardoise"
+          >
+            <LockIcon className="h-3.5 w-3.5" />
+            {t("Espace pro", "Staff area")}
+          </Link>
         </div>
       </div>
     </footer>
@@ -112,6 +126,27 @@ export function SiteFooter() {
 
 function iconBase(className?: string) {
   return `text-current ${className ?? ""}`;
+}
+
+function LockIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={iconBase(className)}>
+      <rect
+        x="5"
+        y="10.5"
+        width="14"
+        height="9.5"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
 }
 
 function MapPinIcon({ className }: { className?: string }) {

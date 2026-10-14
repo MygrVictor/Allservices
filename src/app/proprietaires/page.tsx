@@ -5,8 +5,12 @@ import { SITE } from "@/lib/site-config";
 import { localizeProduct, productsForAudience } from "@/lib/catalog";
 import { getLocale } from "@/lib/i18n-server";
 import { makeT } from "@/lib/i18n";
+import { loadSettings } from "@/lib/settings";
 
-export default function ProprietairesPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ProprietairesPage() {
+  await loadSettings();
   const locale = getLocale();
   const t = makeT(locale);
   productsForAudience("proprietaire").map((p) => localizeProduct(p, locale));
@@ -17,7 +21,10 @@ export default function ProprietairesPage() {
         "Vous remplissez le formulaire de contact en quelques lignes : votre logement, sa station (Arc 1800 ou Arc 2000) et vos disponibilités.",
         "Fill in the contact form in a few lines: your property, its resort (Arc 1800 or Arc 2000) and your availability.",
       ),
-      cta: { href: "/contact?sujet=proprietaire", label: t("Remplir le formulaire", "Fill in the form") },
+      cta: {
+        href: "/contact?sujet=proprietaire",
+        label: t("Remplir le formulaire", "Fill in the form"),
+      },
     },
     {
       title: t("On échange sur vos besoins", "We discuss your needs"),
@@ -33,7 +40,11 @@ export default function ProprietairesPage() {
         "Key handover, cleaning, fresh linen and check-out inspection, according to the services you chose.",
       ),
     },
-  ] as { title: string; description: string; cta?: { href: string; label: string } }[];
+  ] as {
+    title: string;
+    description: string;
+    cta?: { href: string; label: string };
+  }[];
 
   const ownerServices = [
     {
@@ -45,7 +56,7 @@ export default function ProprietairesPage() {
         "Nous accueillons vos locataires et gérons toutes les remises de clés de la saison.",
         "We welcome your tenants and handle every key handover throughout the season.",
       ),
-      photo: "/services/remise-cles.jpg",
+      photo: "/services/remise-cles.png",
       icon: <KeyIcon className="h-4 w-4" />,
     },
     {
@@ -54,10 +65,10 @@ export default function ProprietairesPage() {
         "Guest welcome + key handover + check-out inspection",
       ),
       description: t(
-        "Remise des clés et état des lieux de sortie en leur présence.",
-        "Key handover and check-out inspection in their presence.",
+        "Remise des clés et vérification de la remise en état du logement .",
+        "Key handover and verification of the property's condition .",
       ),
-      photo: "/services/etat-des-lieux.jpg",
+      photo: "/services/etat-des-lieux.png",
       icon: <ClipboardIcon className="h-4 w-4" />,
     },
     {
@@ -66,7 +77,7 @@ export default function ProprietairesPage() {
         "Nettoyage complet du logement entre deux locations, prêt pour les prochains arrivants.",
         "Full cleaning of the property between lets, ready for the next guests.",
       ),
-      photo: undefined as string | undefined,
+      photo: "/menage_fin_sejour.jpg",
       icon: <SparkleIcon className="h-4 w-4" />,
     },
     {
@@ -78,7 +89,7 @@ export default function ProprietairesPage() {
         "Lavage, séchage et repassage de votre linge de lit et de toilette.",
         "Washing, drying and ironing of your bed and bath linen.",
       ),
-      photo: "/services/blanchisserie.jpg",
+      photo: "/services/blanchisserie.png",
       icon: <BriefcaseIcon className="h-4 w-4" />,
     },
   ];
@@ -119,15 +130,15 @@ export default function ProprietairesPage() {
                   "All Services Montagne · Owners",
                 )}
               </p>
-              <h1 className="mt-3 max-w-4xl text-4xl leading-tight text-ardoise sm:text-5xl">
+              <h1 className="hero-title mt-3 max-w-4xl text-ardoise">
                 {t(
-                  "Simplifiez vos rotations locatives sur les Arcs avec une conciergerie fiable, locale et réactive.",
+                  "Simplifiez vos rotations locatives aux Arcs avec une conciergerie fiable, locale et réactive, avec une équipe des professionnels",
                   "Simplify your rental turnovers in Les Arcs with a reliable, local and responsive concierge.",
                 )}
               </h1>
               <p className="mt-5 max-w-3xl text-lg text-slate-700">
                 {t(
-                  "Nous prenons en charge les temps clés de vos locations saisonnières : remises de clés, ménage, blanchisserie du linge et états des lieux. Vous gagnez du temps, sans gérer de plateforme compliquée.",
+                  " Nous prenons tout en charge  : accueil des locataires, remises de clés, états des lieux, ménage, blanchisserie, location de linge. \n                  Notre équipe de professionnels est là pour vous faciliter la vie.  ",
                   "We take care of the key moments of your holiday lets: key handovers, cleaning, linen laundry and inspections. You save time, without managing a complicated platform.",
                 )}
               </p>
@@ -168,7 +179,10 @@ export default function ProprietairesPage() {
 
           <ul className="mt-10 grid divide-y divide-primary/10 overflow-hidden rounded-[24px] border border-primary/10 bg-white shadow-soft sm:grid-cols-3 sm:divide-x sm:divide-y-0">
             {highlights.map((item) => (
-              <li key={item.label} className="flex items-center gap-4 px-5 py-5">
+              <li
+                key={item.label}
+                className="flex items-center gap-4 px-5 py-5"
+              >
                 <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-light/80 text-sapin ring-1 ring-primary/10">
                   {item.icon}
                 </span>
@@ -390,8 +404,8 @@ export default function ProprietairesPage() {
                 </h2>
                 <p className="mt-3 max-w-xl text-white/85">
                   {t(
-                    "Avec un ancrage local dans les deux stations, nous facilitons les arrivées et départs de vos locataires.",
-                    "With a local presence in both resorts, we make your tenants' arrivals and departures easier.",
+                    "Nous intervenons sur Arc 1800 et Arc 2000, avec notre savoir faire, pour organiser et faciliter les arrivées et départs de vos locataires.",
+                    "We operate in Arc 1800 and Arc 2000, with our expertise, to organize and facilitate the arrivals and departures of your tenants.",
                   )}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -405,7 +419,10 @@ export default function ProprietairesPage() {
                     </span>
                   ))}
                   <span className="inline-flex items-center rounded-full border border-white/25 bg-white/10 px-3 py-1 text-sm font-semibold">
-                    {t("Réactifs 7j/7 en saison", "Available 7 days a week in season")}
+                    {t(
+                      "Réactifs 7j/7 en saison",
+                      "Available 7 days a week in season",
+                    )}
                   </span>
                 </div>
               </div>

@@ -8,6 +8,9 @@ export const SITE = {
   openingHours:
     "hiver 7j/7 9h–12h et 15h–19h ; été du mardi au dimanche 9h30–12h et 15h30–18h30, fermé le lundi",
   deliveryWindow: "17h – 19h",
+  openingHoursEn:
+    "winter 7 days a week 9am–12pm and 3pm–7pm; summer Tuesday to Sunday 9:30am–12pm and 3:30pm–6:30pm, closed Mondays",
+  deliveryWindowEn: "5pm – 7pm",
   /**
    * Photo de fond de l'accueil. PLACEHOLDER libre de droits (Unsplash) :
    * à remplacer par une photo des Arcs (ex. /images/hero-les-arcs.jpg).
@@ -32,12 +35,12 @@ export const STATIONS: Station[] = [
   {
     id: "arc_1800",
     name: "Arc 1800",
-    address: "Galerie du Charvet 73700 Les Arcs 1800",
+    address: "Galerie commercante du Charvet ",
     directions:
-      "Dans la galerie commerciale, en bas de la Poste. Accès piéton depuis le centre Charvet.",
+      "Dans la galerie commerciale, en bas de la Poste. Accès piéton depuis la « gare routière du Charvet ».",
     services: [
-      "Conciergerie (remise de clés, états des lieux)",
-      "Blanchisserie : déposez votre linge, on le lave pour vous",
+      "Conciergerie (remise de clés, états des lieux, ménage de sortie, location de linge, blanchisserie)",
+      "Blanchisserie : déposez votre linge, on le lave pour vous dans la journée",
       "Location de linge & équipement bébé",
     ],
     photo: "/stations/arc1800/plan.jpg",
@@ -50,8 +53,9 @@ export const STATIONS: Station[] = [
   {
     id: "arc_2000",
     name: "Arc 2000",
-    address: "Place haute, en face de Skiset, 73700 Les Arcs 2000",
-    directions: "Sur la place haute d'Arc 2000, face au magasin Skiset.",
+    address: "Place haute, en face de Skiset Aiguille Rouge",
+    directions:
+      "Sur la place haute d'Arc 2000, face au magasin Skiset Aiguille Rouge.",
     services: [
       "Laverie automatique en libre-service",
       "Conciergerie : mêmes prestations qu'à Arc 1800",
@@ -65,17 +69,12 @@ export const STATIONS: Station[] = [
   },
 ];
 
-export function isSiteInStandby() {
-  return process.env.NEXT_PUBLIC_SITE_STATUS === "veille";
-}
-
 /** Textes de SITE dépendant de la langue. */
 export function siteText(locale: "fr" | "en") {
   return locale === "en"
     ? {
-        openingHours:
-          "winter 7 days a week 9am–12pm and 3pm–7pm; summer Tuesday to Sunday 9:30am–12pm and 3:30pm–6:30pm, closed Mondays",
-        deliveryWindow: "5pm – 7pm",
+        openingHours: SITE.openingHoursEn,
+        deliveryWindow: SITE.deliveryWindowEn,
       }
     : {
         openingHours: SITE.openingHours,
@@ -90,17 +89,19 @@ const STATIONS_EN: Record<
   arc_1800: {
     address: "Galerie du Charvet , 73700 Les Arcs 1800",
     directions:
-      "In the shopping arcade, below the Post Office. Pedestrian access from the Charvet centre.",
+      "In the shopping arcade, below the Post Office. Pedestrian access from the Charvet bus station.",
     services: [
-      "Concierge (key handover, check-out inspections)",
-      "Laundry service: drop off your laundry, we wash it for you",
+      "Concierge (key handover, check-out inspections, end-of-stay cleaning, linen rental, laundry)",
+      "Laundry service: drop off your laundry, we wash it for you the same day",
       "Linen & baby equipment rental",
       "Ski rental packs (Skiset partner)",
     ],
   },
   arc_2000: {
-    address: "Upper square, opposite Skiset, 73700 Les Arcs 2000",
-    directions: "On the upper square of Arc 2000, facing the Skiset shop.",
+    address:
+      "Upper square, opposite Skiset Aiguille Rouge, 73700 Les Arcs 2000",
+    directions:
+      "On the upper square of Arc 2000, facing the Skiset Aiguille Rouge shop.",
     services: [
       "Self-service launderette",
       "Concierge: same services as Arc 1800",

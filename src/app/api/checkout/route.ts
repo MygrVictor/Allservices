@@ -1,28 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BookingStatus, Residence, TargetAudience } from "@prisma/client";
-import {
-  DELIVERY_PRODUCT_CODE,
-  PRODUCTS,
-  isOrderable,
-  type CatalogProduct,
-} from "@/lib/catalog";
+import { buildOrderLines } from "@/lib/checkout";
 import { getPaymentProvider } from "@/lib/payment";
 import { appOrigin } from "@/lib/orders";
 import { prisma } from "@/lib/prisma";
-import { SITE, isSiteInStandby } from "@/lib/site-config";
+import { loadSettings } from "@/lib/settings";
+import { SITE } from "@/lib/site-config";
 import { checkoutPayloadSchema } from "@/lib/validation";
 
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   try {
-    if (isSiteInStandby()) {
-      return NextResponse.json(
-        { error: "Le paiement en ligne est désactivé hors saison." },
-        { status: 403 },
-      );
-    }
-
     const provider = getPaymentProvider();
     if (!provider.isConfigured()) {
       return NextResponse.json(
@@ -32,6 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     const parsed = checkoutPayloadSchema.safeParse(await request.json());
+    await loadSettings();
     if (!parsed.success) {
       return NextResponse.json(
         { error: parsed.error.issues[0]?.message ?? "Données invalides." },
@@ -41,39 +31,36 @@ export async function POST(request: NextRequest) {
     const payload = parsed.data;
 
     // Les prix viennent TOUJOURS du catalogue serveur, jamais du client.
-    const catalogMap = new Map(PRODUCTS.map((p) => [p.code, p]));
-    const lines: { product: CatalogProduct; quantity: number }[] = [];
-    for (const item of payload.items) {
-      const product = catalogMap.get(item.productCode);
-      if (
-        !product ||
-        product.targetAudience !== "vacancier" ||
-        product.category === "livraison" || // ajoutée automatiquement
-        !isOrderable(product) ||
-        (product.residence && product.residence !== payload.residence)
-      ) {
-        return NextResponse.json(
-          { error: "Un produit de votre panier n'est pas disponible." },
-          { status: 400 },
-        );
-      }
-      lines.push({ product, quantity: item.quantity });
+    const order = buildOrderLines(payload);
+    if (!order) {
+      return NextResponse.json(
+        { error: "Un produit de votre panier n'est pas disponible." },
+        { status: 400 },
+      );
     }
-
-    if (payload.modeRecuperation === "livraison") {
-      const delivery = catalogMap.get(DELIVERY_PRODUCT_CODE);
-      if (delivery) lines.push({ product: delivery, quantity: 1 });
-    }
-
-    const total = lines.reduce(
-      (sum, line) => sum + line.product.priceCents * line.quantity,
-      0,
-    );
+    const { lines, totalCents: total } = order;
 
     const creneau =
       payload.modeRecuperation === "livraison"
         ? `Livraison entre ${SITE.deliveryWindow} (créneau planifié par All Services)`
         : "Retrait en magasin pendant les heures d'ouverture";
+
+    // Synchronise la fiche produit en base (nom/prix modifiés dans le back-office)
+    for (const { product } of lines) {
+      const data = {
+        name: product.name,
+        description: product.description,
+        priceCents: product.priceCents,
+        targetAudience: product.targetAudience as TargetAudience,
+        category: product.category,
+        isActive: product.active,
+      };
+      await prisma.product.upsert({
+        where: { code: product.code },
+        create: { code: product.code, ...data },
+        update: data,
+      });
+    }
 
     const booking = await prisma.booking.create({
       data: {
@@ -97,20 +84,7 @@ export async function POST(request: NextRequest) {
           create: lines.map(({ product, quantity }) => ({
             quantity,
             unitPriceCents: product.priceCents,
-            product: {
-              connectOrCreate: {
-                where: { code: product.code },
-                create: {
-                  code: product.code,
-                  name: product.name,
-                  description: product.description,
-                  priceCents: product.priceCents,
-                  targetAudience: product.targetAudience as TargetAudience,
-                  category: product.category,
-                  isActive: product.active,
-                },
-              },
-            },
+            product: { connect: { code: product.code } },
           })),
         },
       },

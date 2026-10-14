@@ -2,13 +2,42 @@ import { BookingStatus } from "@prisma/client";
 import { sendBookingEmails } from "@/lib/email";
 import { generateOrderPdf } from "@/lib/order-pdf";
 import { prisma } from "@/lib/prisma";
+import { loadSettings } from "@/lib/settings";
 
 export function appOrigin(fallback?: string) {
   return (process.env.NEXT_PUBLIC_APP_URL ?? fallback ?? "").replace(/\/$/, "");
 }
 
-export function orderDownloadPath(downloadToken: string) {
-  return `/api/bon-de-commande/${downloadToken}`;
+export type OrderPdfKind = "linge" | "ski";
+
+export function orderDownloadPath(downloadToken: string, kind?: OrderPdfKind) {
+  return `/api/bon-de-commande/${downloadToken}${kind ? `?type=${kind}` : ""}`;
+}
+
+export function parseOrderPdfKind(
+  value: string | null,
+): OrderPdfKind | undefined {
+  return value === "linge" || value === "ski" ? value : undefined;
+}
+
+type OrderWithItems = NonNullable<Awaited<ReturnType<typeof loadOrderForPdf>>>;
+
+function itemKind(item: OrderWithItems["items"][number]): OrderPdfKind {
+  return item.product.category === "ski" ? "ski" : "linge";
+}
+
+/** Bons disponibles pour une commande (linge et/ou ski). */
+export function orderPdfKinds(booking: {
+  items: { product: { category: string } }[];
+}): OrderPdfKind[] {
+  const kinds = new Set(
+    booking.items.map((i) => (i.product.category === "ski" ? "ski" : "linge")),
+  );
+  return (["linge", "ski"] as const).filter((k) => kinds.has(k));
+}
+
+export function orderPdfFilename(bookingId: string, kind?: OrderPdfKind) {
+  return `bon-${kind === "ski" ? "ski-skiset" : kind === "linge" ? "linge" : "de-commande"}-${bookingId}.pdf`;
 }
 
 export async function loadOrderForPdf(
@@ -21,9 +50,18 @@ export async function loadOrderForPdf(
 }
 
 export async function buildOrderPdf(
-  booking: NonNullable<Awaited<ReturnType<typeof loadOrderForPdf>>>,
+  booking: OrderWithItems,
+  kind?: OrderPdfKind,
 ) {
+  await loadSettings();
+  const items = kind
+    ? booking.items.filter((item) => itemKind(item) === kind)
+    : booking.items;
+  const totalCents = kind
+    ? items.reduce((sum, i) => sum + i.unitPriceCents * i.quantity, 0)
+    : booking.montantTotalCents;
   return generateOrderPdf({
+    kind,
     bookingId: booking.id,
     createdAt: booking.createdAt,
     paidAt: booking.paidAt,
@@ -35,8 +73,8 @@ export async function buildOrderPdf(
     dateArrivee: booking.dateArrivee,
     dateDepart: booking.dateDepart,
     creneauLivraison: booking.creneauLivraison,
-    totalCents: booking.montantTotalCents,
-    items: booking.items.map((item) => ({
+    totalCents,
+    items: items.map((item) => ({
       code: item.product.code,
       name: item.product.name,
       quantity: item.quantity,
@@ -71,8 +109,18 @@ export async function confirmOrderPayment(params: {
   const booking = await loadOrderForPdf({ id: params.bookingId });
   if (!booking) return;
 
-  const pdf = await buildOrderPdf(booking);
   const origin = appOrigin();
+  const kinds = orderPdfKinds(booking);
+  const documents = await Promise.all(
+    kinds.map(async (kind) => ({
+      kind,
+      filename: orderPdfFilename(booking.id, kind),
+      pdf: await buildOrderPdf(booking, kind),
+      url: origin
+        ? `${origin}${orderDownloadPath(booking.downloadToken, kind)}`
+        : undefined,
+    })),
+  );
 
   await sendBookingEmails({
     bookingId: booking.id,
@@ -91,9 +139,6 @@ export async function confirmOrderPayment(params: {
       quantity: item.quantity,
       unitPriceCents: item.unitPriceCents,
     })),
-    pdf,
-    downloadUrl: origin
-      ? `${origin}${orderDownloadPath(booking.downloadToken)}`
-      : undefined,
+    documents,
   });
 }

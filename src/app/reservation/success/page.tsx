@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BookingStatus } from "@prisma/client";
 import { PageContainer } from "@/components/page-container";
-import { orderDownloadPath } from "@/lib/orders";
+import { orderDownloadPath, orderPdfKinds } from "@/lib/orders";
 import { prisma } from "@/lib/prisma";
 import { getT } from "@/lib/i18n-server";
 
@@ -20,6 +20,7 @@ export default async function ReservationSuccessPage({
           status: true,
           clientEmail: true,
           downloadToken: true,
+          items: { select: { product: { select: { category: true } } } },
         },
       })
     : null;
@@ -63,17 +64,25 @@ export default async function ReservationSuccessPage({
             </p>
           )}
           <div className="mt-6 flex flex-wrap gap-3">
-            {paid && booking && (
-              <a
-                href={orderDownloadPath(booking.downloadToken)}
-                className="rounded-full bg-accent px-5 py-2.5 font-bold text-ardoise hover:bg-accent-dark"
-              >
-                {t(
-                  "Télécharger le bon de commande (PDF)",
-                  "Download the order form (PDF)",
-                )}
-              </a>
-            )}
+            {paid &&
+              booking &&
+              orderPdfKinds(booking).map((kind) => (
+                <a
+                  key={kind}
+                  href={orderDownloadPath(booking.downloadToken, kind)}
+                  className="rounded-full bg-accent px-5 py-2.5 font-bold text-ardoise hover:bg-accent-dark"
+                >
+                  {kind === "ski"
+                    ? t(
+                        "Télécharger le bon ski Skiset (PDF)",
+                        "Download the Skiset ski voucher (PDF)",
+                      )
+                    : t(
+                        "Télécharger le bon linge (PDF)",
+                        "Download the linen order form (PDF)",
+                      )}
+                </a>
+              ))}
             <Link
               href="/"
               className="rounded-full bg-primary px-4 py-2.5 text-white"

@@ -3,12 +3,14 @@ import type { PaymentProvider } from "./types";
 
 /**
  * Systempay (Caisse d'Épargne / Banque Populaire) — API REST V4.
- * Création d'un ordre de paiement (page hébergée) via Charge/CreatePaymentOrder,
- * puis confirmation via l'IPN (kr-answer + kr-hash signé avec le mot de passe).
+ * Création d'un formToken via Charge/CreatePayment, affiché dans le formulaire
+ * embarqué (page /paiement), puis confirmation via le retour navigateur
+ * (/api/payment/return/systempay) et l'IPN (kr-answer + kr-hash).
  *
  * Variables : SYSTEMPAY_USER, SYSTEMPAY_PASSWORD (test ou prod),
+ * NEXT_PUBLIC_SYSTEMPAY_PUBLIC_KEY (clé publique JavaScript),
  * SYSTEMPAY_API_URL (défaut https://api.systempay.fr),
- * SYSTEMPAY_HMAC_KEY (vérification du retour navigateur, optionnel).
+ * SYSTEMPAY_HMAC_KEY (vérification du retour navigateur).
  */
 function apiBase() {
   return (process.env.SYSTEMPAY_API_URL ?? "https://api.systempay.fr").replace(
@@ -57,7 +59,9 @@ export const systempayProvider: PaymentProvider = {
 
   isConfigured() {
     return Boolean(
-      process.env.SYSTEMPAY_USER && process.env.SYSTEMPAY_PASSWORD,
+      process.env.SYSTEMPAY_USER &&
+      process.env.SYSTEMPAY_PASSWORD &&
+      process.env.NEXT_PUBLIC_SYSTEMPAY_PUBLIC_KEY,
     );
   },
 
@@ -69,7 +73,7 @@ export const systempayProvider: PaymentProvider = {
     }
 
     const response = await fetch(
-      `${apiBase()}/api-payment/V4/Charge/CreatePaymentOrder`,
+      `${apiBase()}/api-payment/V4/Charge/CreatePayment`,
       {
         method: "POST",
         headers: {
@@ -80,20 +84,16 @@ export const systempayProvider: PaymentProvider = {
           amount: input.totalCents,
           currency: "EUR",
           orderId: input.bookingId,
-          channelOptions: { channelType: "URL" },
           customer: {
             email: input.customerEmail,
+            reference: input.bookingId,
             billingDetails: {
               firstName: input.customerFirstName,
               lastName: input.customerLastName || input.customerFirstName,
               language: "fr",
             },
           },
-          paymentReceiptEmail: input.customerEmail,
-          merchantComment: `Commande ${input.bookingId}`,
           ipnTargetUrl: input.notificationUrl,
-          returnUrl: input.successUrl,
-          dataCollectionForm: false,
           metadata: { bookingId: input.bookingId },
         }),
       },
@@ -106,18 +106,25 @@ export const systempayProvider: PaymentProvider = {
     }
 
     const data = (await response.json()) as SystempayResponse<{
-      paymentOrderId?: string;
-      paymentURL?: string;
+      formToken?: string;
     }>;
-    if (data.status !== "SUCCESS" || !data.answer.paymentURL) {
+    if (data.status !== "SUCCESS" || !data.answer.formToken) {
       throw new Error(
         `Systempay : ${data.answer.errorCode ?? "?"} ${data.answer.errorMessage ?? ""}`.trim(),
       );
     }
 
+    // Page interne affichant le formulaire de carte Systempay.
+    const origin = new URL(input.successUrl).origin;
+    const params = new URLSearchParams({
+      formToken: data.answer.formToken,
+      success: input.successUrl,
+      cancel: input.cancelUrl,
+      amount: String(input.totalCents),
+    });
     return {
-      redirectUrl: data.answer.paymentURL,
-      paymentRef: data.answer.paymentOrderId ?? input.bookingId,
+      redirectUrl: `${origin}/paiement?${params.toString()}`,
+      paymentRef: `systempay_${input.bookingId}`,
     };
   },
 
@@ -138,18 +145,26 @@ export const systempayProvider: PaymentProvider = {
       throw new Error("Signature Systempay (kr-hash) invalide.");
     }
 
-    const answer = JSON.parse(krAnswer) as {
-      orderStatus?: string;
-      orderDetails?: { orderId?: string };
-      transactions?: { uuid?: string; metadata?: Record<string, string> }[];
-    };
-
-    const tx = answer.transactions?.[0];
-    const bookingId = answer.orderDetails?.orderId ?? tx?.metadata?.bookingId;
-
-    if (answer.orderStatus === "PAID" && bookingId) {
-      return { type: "paid", bookingId, paymentRef: tx?.uuid ?? bookingId };
-    }
-    return { type: "ignored" };
+    const answer = JSON.parse(krAnswer) as SystempayAnswer;
+    return answerToEvent(answer);
   },
 };
+
+type SystempayAnswer = {
+  orderStatus?: string;
+  orderDetails?: { orderId?: string };
+  transactions?: { uuid?: string; metadata?: Record<string, string> }[];
+};
+
+export function answerToEvent(answer: SystempayAnswer) {
+  const tx = answer.transactions?.[0];
+  const bookingId = answer.orderDetails?.orderId ?? tx?.metadata?.bookingId;
+  if (answer.orderStatus === "PAID" && bookingId) {
+    return {
+      type: "paid" as const,
+      bookingId,
+      paymentRef: tx?.uuid ?? bookingId,
+    };
+  }
+  return { type: "ignored" as const, bookingId };
+}

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Merriweather, Source_Sans_3 } from "next/font/google";
+import { Fraunces, Merriweather, Source_Sans_3 } from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { LocaleProvider } from "@/components/locale-provider";
 import { CartProvider } from "@/components/cart-provider";
 import { getLocale } from "@/lib/i18n-server";
 import { makeT } from "@/lib/i18n";
-import { isSiteInStandby } from "@/lib/site-config";
+import { loadSettings } from "@/lib/settings";
+import { SettingsHydrator } from "@/components/settings-hydrator";
 import "./globals.css";
 
 const headingFont = Merriweather({
@@ -19,6 +20,13 @@ const bodyFont = Source_Sans_3({
   variable: "--font-body",
   subsets: ["latin"],
   weight: ["400", "600", "700"],
+});
+
+const displayFont = Fraunces({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
 });
 
 const siteUrl =
@@ -61,36 +69,30 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const standby = isSiteInStandby();
+  const settings = await loadSettings();
   const locale = getLocale();
   const t = makeT(locale);
 
   return (
     <html
       lang={locale}
-      className={`${headingFont.variable} ${bodyFont.variable} h-full antialiased`}
+      className={`${headingFont.variable} ${bodyFont.variable} ${displayFont.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-neige text-slate-800 selection:bg-sapin/20">
-        <LocaleProvider locale={locale}>
-          <CartProvider>
-            {standby && (
-              <div className="bg-amber-100 px-4 py-2 text-center text-sm text-amber-900">
-                {t(
-                  "Site en veille hors saison. Les demandes restent possibles via le formulaire de contact.",
-                  "Off-season mode. Requests are still possible via the contact form.",
-                )}
-              </div>
-            )}
-            <SiteHeader />
-            <main>{children}</main>
-            <SiteFooter />
-          </CartProvider>
-        </LocaleProvider>
+        <SettingsHydrator settings={settings}>
+          <LocaleProvider locale={locale}>
+            <CartProvider>
+              <SiteHeader />
+              <main>{children}</main>
+              <SiteFooter />
+            </CartProvider>
+          </LocaleProvider>
+        </SettingsHydrator>
       </body>
     </html>
   );

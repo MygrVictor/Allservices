@@ -12,6 +12,9 @@ import {
 import { STATIONS } from "@/lib/site-config";
 import { getLocale } from "@/lib/i18n-server";
 import { makeT } from "@/lib/i18n";
+import { loadSettings } from "@/lib/settings";
+
+export const dynamic = "force-dynamic";
 
 export function generateMetadata() {
   const t = makeT(getLocale());
@@ -27,7 +30,8 @@ export function generateMetadata() {
   };
 }
 
-export default function PacksSkiPage() {
+export default async function PacksSkiPage() {
+  await loadSettings();
   const locale = getLocale();
   const t = makeT(locale);
   const allPacks = skiPacks().map((p) => localizeProduct(p, locale));
@@ -56,7 +60,7 @@ export default function PacksSkiPage() {
                   "All Services Montagne · Ski rental",
                 )}
               </p>
-              <h1 className="mt-3 text-4xl leading-tight text-white sm:text-5xl">
+              <h1 className="hero-title mt-3 text-white">
                 {t(
                   "Packs location de ski adulte & enfant",
                   "Adult & child ski rental packs",
@@ -169,10 +173,7 @@ export default function PacksSkiPage() {
                 {
                   icon: "💳",
                   title: t("Payez en ligne", "Pay online"),
-                  text: t(
-                    "Paiement sécurisé.",
-                    "Secure payment.",
-                  ),
+                  text: t("Paiement sécurisé.", "Secure payment."),
                 },
                 {
                   icon: "🎟",

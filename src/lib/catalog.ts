@@ -29,14 +29,18 @@ export type CatalogProduct = {
    * commandable. Le texte est affiché à la place du prix.
    */
   pricePending?: string;
+  /** Traductions saisies dans le back-office (prioritaires). */
+  nameEn?: string;
+  descriptionEn?: string;
+  /** Photo de la prestation (URL, ex. /api/images/xxx). */
+  photo?: string;
 };
 
 export const PRODUCTS: CatalogProduct[] = [
   {
     code: "accueil-clefs-illimite",
     name: "Accueil et remise de clefs illimité en saison",
-    description:
-      "Remises de clés pendant la saison.",
+    description: "Remises de clés pendant la saison.",
     priceCents: 38000,
     targetAudience: "proprietaire",
     category: "remise_cles",
@@ -45,8 +49,7 @@ export const PRODUCTS: CatalogProduct[] = [
   {
     code: "remise-clefs-etat-lieux",
     name: "Remise des clefs / état des lieux de sortie",
-    description:
-      "Remise des clés avec état des lieux de sortie en présence des locataires.",
+    description: "Remise des clés avec état des lieux de sortie.",
     priceCents: 6500,
     targetAudience: "proprietaire",
     category: "etat_des_lieux",
@@ -392,15 +395,24 @@ export function localizeProduct<T extends CatalogProduct>(
   locale: "fr" | "en",
 ): T {
   if (locale === "fr") return product;
-  const en = PRODUCTS_EN[product.code];
-  if (!en) return product;
+  const en = englishFor(product);
   return {
     ...product,
     name: en.name,
     description: en.description,
     pricePending: product.pricePending
-      ? (en.pricePending ?? product.pricePending)
+      ? (PRODUCTS_EN[product.code]?.pricePending ?? product.pricePending)
       : undefined,
+  };
+}
+
+/** Nom / description anglais : saisie back-office, sinon traduction intégrée. */
+export function englishFor(product: CatalogProduct) {
+  const en = PRODUCTS_EN[product.code];
+  return {
+    name: product.nameEn || en?.name || product.name,
+    description:
+      product.descriptionEn || en?.description || product.description,
   };
 }
 

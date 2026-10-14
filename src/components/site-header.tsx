@@ -21,7 +21,7 @@ export function SiteHeader() {
   ];
 
   const vacancierSublinks = [
-    { href: "/vacanciers", label: t("Location de linges", "Linen rentals") },
+    { href: "/vacanciers", label: t("Location de linge", "Linen rental") },
     { href: "/packs-ski", label: t("Location de skis", "Ski rentals") },
   ];
 

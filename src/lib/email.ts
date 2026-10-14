@@ -21,10 +21,13 @@ type EmailPayload = {
   creneauLivraison?: string | null;
   totalCents: number;
   items: EmailBookingItem[];
-  /** Bon de commande PDF joint au mail client. */
-  pdf?: Uint8Array;
-  /** Lien de téléchargement du bon (sans compte client). */
-  downloadUrl?: string;
+  /** Bons PDF (linge et/ou ski) joints au mail, avec leur lien de téléchargement. */
+  documents?: {
+    kind: "linge" | "ski";
+    filename: string;
+    pdf: Uint8Array;
+    url?: string;
+  }[];
 };
 
 function formatEuros(cents: number) {
@@ -58,14 +61,22 @@ export async function sendBookingEmails(payload: EmailPayload) {
     { locale: fr },
   )}`;
 
-  const attachments = payload.pdf
-    ? [
-        {
-          filename: `bon-de-commande-${payload.bookingId}.pdf`,
-          content: Buffer.from(payload.pdf),
-        },
-      ]
+  const docs = payload.documents ?? [];
+  const attachments = docs.length
+    ? docs.map((d) => ({
+        filename: d.filename,
+        content: Buffer.from(d.pdf),
+      }))
     : undefined;
+  const docLabel = (kind: "linge" | "ski") =>
+    kind === "ski"
+      ? "Bon de retrait ski (valable dans n'importe quel magasin Skiset de votre station)"
+      : "Bon de commande linge / conciergerie";
+  const docsText = docs.length
+    ? `Vos documents (en pièce jointe) :\n${docs
+        .map((d) => `- ${docLabel(d.kind)}${d.url ? ` : ${d.url}` : ""}`)
+        .join("\n")}\n\n`
+    : "";
 
   await Promise.all([
     resend.emails.send({
@@ -75,8 +86,8 @@ export async function sendBookingEmails(payload: EmailPayload) {
       attachments,
       text:
         `Bonjour ${payload.clientNom},\n\n` +
-        `Votre paiement est confirmé. Vous trouverez votre bon de commande en pièce jointe` +
-        `${payload.downloadUrl ? ` (également téléchargeable ici : ${payload.downloadUrl})` : ""}.\n\n` +
+        `Votre paiement est confirmé.\n\n` +
+        docsText +
         `Période : ${period}\n` +
         `${payload.residence ? `Résidence : ${payload.residence}\n` : ""}` +
         `${payload.propertyReference ? `Bien : ${payload.propertyReference}\n` : ""}` +

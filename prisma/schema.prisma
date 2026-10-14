@@ -9,7 +9,9 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url       = env("DATABASE_URL")
+  // Connexion directe (port 5432) utilisée pour les migrations.
+  directUrl = env("DIRECT_URL")
 }
 
 enum TargetAudience {
@@ -79,6 +81,21 @@ model Booking {
 
   @@index([dateArrivee, dateDepart])
   @@index([targetAudience, residence])
+}
+
+/// Réglages modifiables depuis le back-office (tarifs, horaires…).
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+/// Photos envoyées depuis le back-office (servies par /api/images/[id]).
+model Image {
+  id        String   @id @default(cuid())
+  mimeType  String
+  data      Bytes
+  createdAt DateTime @default(now())
 }
 
 model BookingItem {

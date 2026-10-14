@@ -73,7 +73,7 @@ export default function VacanciersPage() {
   const comfortPills = [
     {
       label: t(
-        "Retrait simple à votre conciergerie",
+        "Retrait simple à dans notre agence",
         "Easy collection at our concierge",
       ),
       icon: <BagIcon className="h-5 w-5" />,
@@ -106,6 +106,15 @@ export default function VacanciersPage() {
           <span className="absolute -top-3 left-4 rounded-full bg-primary px-3 py-0.5 text-xs font-bold uppercase tracking-wide text-white shadow">
             ★ {t("Pack complet", "Complete pack")}
           </span>
+        )}
+        {product.photo && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={product.photo}
+            alt={product.name}
+            loading="lazy"
+            className="-mx-5 -mt-5 mb-4 aspect-[4/3] w-[calc(100%+2.5rem)] max-w-none rounded-t-[inherit] object-cover"
+          />
         )}
         <div className="flex items-start gap-3 mb-3">
           <span className="inline-flex rounded-full bg-primary-light/60 p-2 text-sapin shrink-0">
@@ -172,7 +181,7 @@ export default function VacanciersPage() {
                   "All Services Montagne · Holidaymakers",
                 )}
               </p>
-              <h1 className="mt-3 max-w-4xl text-4xl leading-tight text-ardoise sm:text-5xl">
+              <h1 className="hero-title mt-3 max-w-4xl text-ardoise">
                 {t(
                   "Réservez votre linge avant d'arriver sur les Arcs.",
                   "Book your linen easily, before you arrive in Les Arcs.",

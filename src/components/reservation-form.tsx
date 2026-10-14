@@ -15,7 +15,7 @@ import {
   type CatalogProduct,
   type Residence,
 } from "@/lib/catalog";
-import { isSiteInStandby, siteText } from "@/lib/site-config";
+import { siteText } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { makeT, type Translate } from "@/lib/i18n";
@@ -82,7 +82,6 @@ export function ReservationForm({
   cart?: Record<string, number>;
   onCartChange?: (quantities: Record<string, number>) => void;
 } = {}) {
-  const standby = isSiteInStandby();
   const locale = useLocale();
   const t = makeT(locale);
   const site = siteText(locale);
@@ -224,15 +223,6 @@ export function ReservationForm({
     event.preventDefault();
     if (step < STEP_COUNT - 1) {
       next();
-      return;
-    }
-    if (standby) {
-      setError(
-        t(
-          "Le site est en veille hors saison. Merci d'utiliser la page contact.",
-          "The site is in off-season mode. Please use the contact page.",
-        ),
-      );
       return;
     }
     if (![0, 1, 2].every((s) => validateStep(s))) return;
@@ -803,14 +793,6 @@ export function ReservationForm({
               `No account needed: after payment, your PDF order form (in French) is downloadable and sent to ${data.clientEmail}.`,
             )}
           </p>
-          {standby && (
-            <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-              {t(
-                "Paiement en ligne désactivé : site en veille hors saison.",
-                "Online payment disabled: off-season mode.",
-              )}
-            </p>
-          )}
         </div>
       )}
 
@@ -839,7 +821,7 @@ export function ReservationForm({
         ) : (
           <button
             type="submit"
-            disabled={pending || totalCents <= 0 || standby}
+            disabled={pending || totalCents <= 0}
             className="rounded-full bg-accent px-6 py-2.5 text-sm font-bold text-ardoise hover:bg-accent-dark disabled:opacity-50"
           >
             {pending

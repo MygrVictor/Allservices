@@ -7,7 +7,9 @@ const nextConfig = {
   },
   experimental: {
     // pdf-lib est utilisé côté serveur (bons de commande)
-    serverComponentsExternalPackages: ["pdf-lib"],
+    serverComponentsExternalPackages: ["pdf-lib", "sharp"],
+    // Envoi de photos depuis le back-office
+    serverActions: { bodySizeLimit: "6mb" },
   },
   async redirects() {
     return [

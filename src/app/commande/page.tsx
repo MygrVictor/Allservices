@@ -50,7 +50,7 @@ export default function CommandePage() {
             <p className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
               🏔️ {t("Dernière étape", "Last step")}
             </p>
-            <h1 className="mt-4 max-w-2xl text-3xl leading-tight sm:text-5xl">
+            <h1 className="hero-title mt-4 max-w-2xl">
               {t(
                 "Plus qu'un pas avant un séjour tout confort !",
                 "One step away from a comfy stay!",

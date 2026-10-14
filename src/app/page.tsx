@@ -2,11 +2,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { PageContainer } from "@/components/page-container";
 import { StationCards } from "@/components/station-cards";
-import { SITE, isSiteInStandby } from "@/lib/site-config";
+import { SITE } from "@/lib/site-config";
 import { getT } from "@/lib/i18n-server";
 
 export default function HomePage() {
-  const standby = isSiteInStandby();
   const t = getT();
   const serviceCards = [
     {
@@ -102,9 +101,9 @@ export default function HomePage() {
                 `Les Arcs 1800 & 2000 · Savoie · Family business for ${SITE.yearsInBusiness} years`,
               )}
             </p>
-            <h1 className="mt-4 max-w-3xl text-3xl leading-tight drop-shadow sm:text-5xl">
+            <h1 className="hero-title mt-4 max-w-3xl drop-shadow">
               {t(
-                "Conciergerie, ménage, blanchisserie et location de linge sur les Arcs.",
+                "Votre conciergerie sur Les Arcs : accueil clients, remise de clefs, ménages, blanchisserie, location de linge et location de ski avec notre partenaire.",
                 "Concierge, cleaning, laundry service and linen rental in Les Arcs.",
               )}
             </h1>
@@ -117,24 +116,17 @@ export default function HomePage() {
 
             <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-2">
               <Link
-                href={standby ? "/contact" : "/vacanciers"}
+                href="/vacanciers"
                 className="rounded-panel bg-accent p-4 text-ardoise shadow-lg transition hover:bg-accent-dark sm:col-span-2"
               >
                 <p className="text-lg font-bold">
-                  {standby
-                    ? t("Demander un devis", "Request a quote")
-                    : t("Réserver mon linge en ligne", "Book my linen online")}
+                  {t("Réserver mon linge en ligne", "Book my linen online")}
                 </p>
                 <p className="mt-1 text-sm">
-                  {standby
-                    ? t(
-                        "Le paiement en ligne est désactivé hors saison.",
-                        "Online payment is disabled off-season.",
-                      )
-                    : t(
-                        "Priorité au linge, avec option location de skis.",
-                        "Linen first, with optional ski rental.",
-                      )}
+                  {t(
+                    "Location de linge, avec option location de ski.",
+                    "Linen rental, with optional ski rental.",
+                  )}
                 </p>
               </Link>
               <Link

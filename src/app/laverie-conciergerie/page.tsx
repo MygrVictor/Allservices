@@ -10,7 +10,7 @@ export default function LaverieConciergeriePage() {
       <section className="py-12">
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-center">
           <div>
-            <h1 className="text-4xl text-ardoise">
+            <h1 className="hero-title text-ardoise">
               {t("Laverie & Conciergerie", "Laundry & Concierge")}
             </h1>
             <p className="mt-3 max-w-2xl text-slate-700">
