@@ -5,7 +5,6 @@ import { SiteHeader } from "@/components/site-header";
 import { LocaleProvider } from "@/components/locale-provider";
 import { CartProvider } from "@/components/cart-provider";
 import { getLocale } from "@/lib/i18n-server";
-import { makeT } from "@/lib/i18n";
 import { loadSettings } from "@/lib/settings";
 import { SettingsHydrator } from "@/components/settings-hydrator";
 import "./globals.css";
@@ -76,7 +75,6 @@ export default async function RootLayout({
 }) {
   const settings = await loadSettings();
   const locale = getLocale();
-  const t = makeT(locale);
 
   return (
     <html
