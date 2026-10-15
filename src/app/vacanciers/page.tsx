@@ -103,7 +103,7 @@ export default function VacanciersPage() {
         }`}
       >
         {pack && (
-          <span className="absolute -top-3 left-4 rounded-full bg-primary px-3 py-0.5 text-xs font-bold uppercase tracking-wide text-white shadow">
+          <span className="absolute -top-3 left-4 z-10 rounded-full bg-primary px-3 py-0.5 text-xs font-bold uppercase tracking-wide text-white shadow">
             ★ {t("Pack complet", "Complete pack")}
           </span>
         )}
@@ -113,7 +113,7 @@ export default function VacanciersPage() {
             src={product.photo}
             alt={product.name}
             loading="lazy"
-            className="-mx-5 -mt-5 mb-4 aspect-[4/3] w-[calc(100%+2.5rem)] max-w-none rounded-t-[inherit] object-cover"
+            className="-mx-5 -mt-5 mb-4 aspect-[2/1] w-[calc(100%+2.5rem)] max-w-none rounded-t-[inherit] object-cover"
           />
         )}
         <div className="flex items-start gap-3 mb-3">
