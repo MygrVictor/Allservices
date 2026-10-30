@@ -27,7 +27,7 @@ export async function GET(
   return new NextResponse(Buffer.from(pdf), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="${orderPdfFilename(booking.id, kind)}"`,
+      "Content-Disposition": `inline; filename="${orderPdfFilename(booking.orderNumber, kind)}"`,
       "Cache-Control": "private, no-store",
     },
   });

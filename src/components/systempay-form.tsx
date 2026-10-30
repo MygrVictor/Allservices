@@ -43,11 +43,7 @@ export function SystempayForm({
     document.head.appendChild(script);
   }, [publicKey, successUrl]);
 
-  return (
-    <div className="kr-embedded" kr-form-token={formToken}>
-      <p className="text-sm text-slate-500">Chargement du formulaire…</p>
-    </div>
-  );
+  return <div className="kr-embedded" kr-form-token={formToken} />;
 }
 
 declare module "react" {

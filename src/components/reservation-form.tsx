@@ -496,7 +496,8 @@ export function ReservationForm({
                           >
                             {orderable
                               ? eur(product.priceCents)
-                              : product.pricePending}
+                              : (product.pricePending ??
+                                t("Bientôt disponible", "Coming soon"))}
                           </p>
                         </div>
                         {orderable && !isSkiPack ? (
@@ -655,6 +656,13 @@ export function ReservationForm({
                       "Show your order form (printed or on your phone).",
                     )}
                   </p>
+                  <p className="mt-2 text-sm font-semibold text-ardoise">
+                    💳{" "}
+                    {t(
+                      "Une empreinte de carte bancaire sera demandée comme caution du linge lors du retrait en agence.",
+                      "A card imprint will be requested as a linen deposit when collecting your order at our office.",
+                    )}
+                  </p>
                 </>
               ) : (
                 <>
@@ -762,6 +770,14 @@ export function ReservationForm({
                     "In-store collection during opening hours",
                   )}
             </p>
+            {data.modeRecuperation === "retrait" && (
+              <p className="text-sm font-medium text-slate-700">
+                {t(
+                  "Empreinte de carte demandée en agence pour la caution du linge.",
+                  "A card imprint is required at the office as a linen deposit.",
+                )}
+              </p>
+            )}
           </div>
           <ul className="space-y-2 text-sm">
             {selectedItems.map((item) => (

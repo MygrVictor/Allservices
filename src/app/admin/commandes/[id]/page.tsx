@@ -24,7 +24,7 @@ export default async function AdminOrderPage({
     date ? format(date, "dd/MM/yyyy HH:mm", { locale: fr }) : "—";
 
   const rows: [string, React.ReactNode][] = [
-    ["N° de commande", b.id],
+    ["N° de commande", String(b.orderNumber)],
     ["Passée le", d(b.createdAt)],
     ["Payée le", d(b.paidAt)],
     ["Client", b.clientNom],

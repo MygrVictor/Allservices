@@ -36,8 +36,8 @@ export function orderPdfKinds(booking: {
   return (["linge", "ski"] as const).filter((k) => kinds.has(k));
 }
 
-export function orderPdfFilename(bookingId: string, kind?: OrderPdfKind) {
-  return `bon-${kind === "ski" ? "ski-skiset" : kind === "linge" ? "linge" : "de-commande"}-${bookingId}.pdf`;
+export function orderPdfFilename(orderNumber: number, kind?: OrderPdfKind) {
+  return `bon-${kind === "ski" ? "ski-skiset" : kind === "linge" ? "linge" : "de-commande"}-${orderNumber}.pdf`;
 }
 
 export async function loadOrderForPdf(
@@ -63,6 +63,7 @@ export async function buildOrderPdf(
   return generateOrderPdf({
     kind,
     bookingId: booking.id,
+    orderNumber: booking.orderNumber,
     createdAt: booking.createdAt,
     paidAt: booking.paidAt,
     clientNom: booking.clientNom,
@@ -114,7 +115,7 @@ export async function confirmOrderPayment(params: {
   const documents = await Promise.all(
     kinds.map(async (kind) => ({
       kind,
-      filename: orderPdfFilename(booking.id, kind),
+      filename: orderPdfFilename(booking.orderNumber, kind),
       pdf: await buildOrderPdf(booking, kind),
       url: origin
         ? `${origin}${orderDownloadPath(booking.downloadToken, kind)}`
@@ -124,6 +125,7 @@ export async function confirmOrderPayment(params: {
 
   await sendBookingEmails({
     bookingId: booking.id,
+    orderNumber: booking.orderNumber,
     audience: booking.targetAudience,
     clientNom: booking.clientNom,
     clientEmail: booking.clientEmail,

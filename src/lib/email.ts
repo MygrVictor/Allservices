@@ -10,6 +10,7 @@ type EmailBookingItem = {
 
 type EmailPayload = {
   bookingId: string;
+  orderNumber: number;
   audience: "proprietaire" | "vacancier";
   clientNom: string;
   clientEmail: string;
@@ -82,7 +83,7 @@ export async function sendBookingEmails(payload: EmailPayload) {
     resend.emails.send({
       from: process.env.EMAIL_FROM,
       to: payload.clientEmail,
-      subject: "All Services - Votre bon de commande",
+      subject: "All Services Montagne - Votre bon de commande",
       attachments,
       text:
         `Bonjour ${payload.clientNom},\n\n` +
@@ -99,7 +100,7 @@ export async function sendBookingEmails(payload: EmailPayload) {
     resend.emails.send({
       from: process.env.EMAIL_FROM,
       to: process.env.EMAIL_TO_MANAGER,
-      subject: `Nouvelle réservation #${payload.bookingId}`,
+      subject: `Nouvelle réservation #${payload.orderNumber}`,
       attachments,
       text:
         `Nouvelle réservation confirmée\n\n` +

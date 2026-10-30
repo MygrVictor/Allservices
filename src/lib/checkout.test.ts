@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildOrderLines } from "@/lib/checkout";
 import {
   DELIVERY_PRODUCT_CODE,
@@ -10,6 +10,8 @@ const base = {
   residence: "arc_1800" as const,
   modeRecuperation: "retrait" as const,
 };
+
+afterEach(() => vi.unstubAllEnvs());
 
 const prix = (code: string) =>
   PRODUCTS.find((p) => p.code === code)!.priceCents;
@@ -121,6 +123,7 @@ describe("buildOrderLines — calcul du total au paiement", () => {
   });
 
   it("refuse un pack ski d'une autre station", () => {
+    vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
     const pack: CatalogProduct = {
       ...PRODUCTS.find((p) => p.code === "ski-pack-adulte-2000")!,
       priceCents: 9900,

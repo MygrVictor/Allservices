@@ -32,7 +32,7 @@ export async function GET(
   return new NextResponse(Buffer.from(pdf), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${orderPdfFilename(booking.id, kind)}"`,
+      "Content-Disposition": `attachment; filename="${orderPdfFilename(booking.orderNumber, kind)}"`,
       "Cache-Control": "private, no-store",
     },
   });

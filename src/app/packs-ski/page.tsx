@@ -20,8 +20,8 @@ export function generateMetadata() {
   const t = makeT(getLocale());
   return {
     title: t(
-      "Packs location de ski — All Services Les Arcs",
-      "Ski rental packs — All Services Les Arcs",
+      "Packs location de ski — All Services Montagne Les Arcs",
+      "Ski rental packs — All Services Montagne Les Arcs",
     ),
     description: t(
       "Packs location de ski adulte et enfant à Arc 1800 et Arc 2000. Bon téléchargeable et envoyé par mail après paiement.",
@@ -141,7 +141,8 @@ export default async function PacksSkiPage() {
                         </span>
                       ) : (
                         <span className="text-sm font-semibold text-amber-700">
-                          {pack.pricePending}
+                          {pack.pricePending ??
+                            t("Bientôt disponible", "Coming soon")}
                         </span>
                       )}
                     </div>

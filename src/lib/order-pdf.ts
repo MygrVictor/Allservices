@@ -14,6 +14,7 @@ import { SITE, STATIONS } from "@/lib/site-config";
 
 export type OrderPdfInput = {
   bookingId: string;
+  orderNumber: number;
   createdAt: Date;
   paidAt?: Date | null;
   clientNom: string;
@@ -84,7 +85,7 @@ export async function generateOrderPdf(
   order: OrderPdfInput,
 ): Promise<Uint8Array> {
   const pdf = await PDFDocument.create();
-  pdf.setTitle(`Bon de commande ${order.bookingId}`);
+  pdf.setTitle(`Bon de commande ${order.orderNumber}`);
   pdf.setAuthor(SITE.name);
 
   const font = await pdf.embedFont(StandardFonts.Helvetica);
@@ -161,7 +162,7 @@ export async function generateOrderPdf(
     font: bold,
     color: KAKI,
   });
-  const sub = safe(`N° ${order.bookingId}`);
+  const sub = safe(`N° ${order.orderNumber}`);
   page.drawText(sub, {
     x: margin + width - font.widthOfTextAtSize(sub, 9),
     y: top - 34,
@@ -383,6 +384,9 @@ export async function generateOrderPdf(
   } else {
     text(
       `Retrait en magasin toute la journée, pendant les heures d'ouverture de la conciergerie (${SITE.openingHours}). Présentez ce bon (papier ou téléphone).`,
+    );
+    text(
+      "Une empreinte de carte bancaire sera demandée en agence comme caution du linge.",
     );
   }
   if (hasSki) {

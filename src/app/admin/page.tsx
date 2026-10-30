@@ -135,6 +135,7 @@ export default async function AdminOrdersPage({
         <table className="w-full min-w-[860px] text-left text-sm">
           <thead className="bg-slate-50 text-slate-600">
             <tr>
+              <th className="px-4 py-3">N°</th>
               <th className="px-4 py-3">Passée le</th>
               <th className="px-4 py-3">Client</th>
               <th className="px-4 py-3">Station</th>
@@ -147,6 +148,9 @@ export default async function AdminOrdersPage({
           <tbody>
             {bookings.map((b) => (
               <tr key={b.id} className="border-t border-slate-100 align-top">
+                <td className="whitespace-nowrap px-4 py-3 font-semibold">
+                  {b.orderNumber}
+                </td>
                 <td className="whitespace-nowrap px-4 py-3">
                   {format(b.createdAt, "dd/MM/yyyy HH:mm", { locale: fr })}
                 </td>

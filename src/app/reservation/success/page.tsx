@@ -17,6 +17,7 @@ export default async function ReservationSuccessPage({
         where: { downloadToken: searchParams.ref },
         select: {
           id: true,
+          orderNumber: true,
           status: true,
           clientEmail: true,
           downloadToken: true,
@@ -41,7 +42,9 @@ export default async function ReservationSuccessPage({
           </h1>
           <p className="mt-3 text-ardoise">
             {t("Merci !", "Thank you!")}{" "}
-            {booking ? `${t("Référence", "Reference")} : ${booking.id}.` : ""}
+            {booking
+              ? `${t("Référence", "Reference")} : ${booking.orderNumber}.`
+              : ""}
           </p>
           {paid && booking ? (
             <p className="mt-2 text-ardoise">

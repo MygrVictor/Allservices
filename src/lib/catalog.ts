@@ -244,7 +244,16 @@ export const PRODUCTS: CatalogProduct[] = [
 
 export const DELIVERY_PRODUCT_CODE = "livraison-domicile-17-19";
 
+/**
+ * La location de ski n'est pas encore activée avec le loueur : elle reste
+ * grisée tant que NEXT_PUBLIC_SKI_RENTAL_ENABLED n'est pas "true".
+ */
+export function isSkiRentalEnabled() {
+  return process.env.NEXT_PUBLIC_SKI_RENTAL_ENABLED === "true";
+}
+
 export function isOrderable(product: CatalogProduct) {
+  if (product.category === "ski" && !isSkiRentalEnabled()) return false;
   return product.active && !product.pricePending && product.priceCents > 0;
 }
 

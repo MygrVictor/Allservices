@@ -57,6 +57,8 @@ model Product {
 
 model Booking {
   id                String         @id @default(cuid())
+  /// Numéro de commande lisible (1, 2, 3…), affiché au client et dans le back-office
+  orderNumber       Int            @unique @default(autoincrement())
   targetAudience    TargetAudience
   residence         Residence?
   propertyReference String?

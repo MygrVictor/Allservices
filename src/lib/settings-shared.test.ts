@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { isOrderable, PRODUCTS } from "@/lib/catalog";
 import { SITE } from "@/lib/site-config";
 import { applySettings, defaultSettings } from "@/lib/settings-shared";
@@ -29,7 +29,11 @@ describe("Réglages du back-office", () => {
       prices: { "ski-pack-adulte-1800": { priceCents: 12900, active: true } },
     });
     expect(product("ski-pack-adulte-1800").pricePending).toBeUndefined();
+    // Grisé tant que la location de ski n'est pas activée.
+    expect(isOrderable(product("ski-pack-adulte-1800"))).toBe(false);
+    vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
     expect(isOrderable(product("ski-pack-adulte-1800"))).toBe(true);
+    vi.unstubAllEnvs();
   });
 
   it("revient aux valeurs d'origine sans réglages", () => {
