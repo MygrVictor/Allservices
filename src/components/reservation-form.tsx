@@ -479,6 +479,7 @@ export function ReservationForm({
                         className={cn(
                           "flex items-center justify-between gap-3 rounded-panel border border-slate-200 p-3",
                           isSkiPack ? "border-indigo-300 bg-indigo-50/60" : "",
+                          isSkiPack && !orderable && "opacity-50 grayscale",
                         )}
                       >
                         <div className="min-w-0">
@@ -496,8 +497,10 @@ export function ReservationForm({
                           >
                             {orderable
                               ? eur(product.priceCents)
-                              : (product.pricePending ??
-                                t("Bientôt disponible", "Coming soon"))}
+                              : isSkiPack
+                                ? t("Pas disponible", "Not available")
+                                : (product.pricePending ??
+                                  t("Bientôt disponible", "Coming soon"))}
                           </p>
                         </div>
                         {orderable && !isSkiPack ? (

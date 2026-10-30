@@ -10,6 +10,7 @@ import {
   skiPacks,
 } from "@/lib/catalog";
 import { STATIONS } from "@/lib/site-config";
+import { cn } from "@/lib/utils";
 import { getLocale } from "@/lib/i18n-server";
 import { makeT } from "@/lib/i18n";
 import { loadSettings } from "@/lib/settings";
@@ -103,7 +104,11 @@ export default async function PacksSkiPage() {
               return (
                 <article
                   key={pack.code}
-                  className="rounded-panel border-2 border-accent/70 bg-gradient-to-br from-accent/8 to-accent/5 p-6 shadow-lg hover:shadow-xl hover:border-accent transition-all flex flex-col"
+                  className={cn(
+                    "rounded-panel border-2 border-accent/70 bg-gradient-to-br from-accent/8 to-accent/5 p-6 shadow-lg hover:shadow-xl hover:border-accent transition-all flex flex-col",
+                    !isOrderable(pack) &&
+                      "pointer-events-none opacity-50 grayscale",
+                  )}
                 >
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div>
@@ -140,9 +145,8 @@ export default async function PacksSkiPage() {
                           {formatEuros(pack.priceCents, locale)}
                         </span>
                       ) : (
-                        <span className="text-sm font-semibold text-amber-700">
-                          {pack.pricePending ??
-                            t("Bientôt disponible", "Coming soon")}
+                        <span className="text-sm font-semibold text-slate-600">
+                          {t("Pas disponible", "Not available")}
                         </span>
                       )}
                     </div>
