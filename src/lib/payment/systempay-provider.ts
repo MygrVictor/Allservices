@@ -162,6 +162,37 @@ type SystempayAnswer = {
   transactions?: { uuid?: string; metadata?: Record<string, string> }[];
 };
 
+/**
+ * Interroge Systempay (Order/Get) pour savoir si une commande est payée.
+ * Appel serveur-à-serveur authentifié : fiable sans dépendre du kr-hash.
+ */
+export async function fetchSystempayPaidEvent(orderId: string) {
+  const response = await fetch(`${apiBase()}/api-payment/V4/Order/Get`, {
+    method: "POST",
+    headers: {
+      Authorization: authHeader(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ orderId }),
+  });
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    throw new Error(
+      `Systempay Order/Get (${response.status}) : ${body.slice(0, 300)}`,
+    );
+  }
+  const data = (await response.json()) as SystempayResponse<SystempayAnswer>;
+  if (data.status !== "SUCCESS") {
+    throw new Error(
+      `Systempay Order/Get : ${data.answer.errorCode ?? "?"} ${data.answer.errorMessage ?? ""}`.trim(),
+    );
+  }
+  return answerToEvent({
+    ...data.answer,
+    orderDetails: { orderId: data.answer.orderDetails?.orderId ?? orderId },
+  });
+}
+
 export function answerToEvent(answer: SystempayAnswer) {
   const tx = answer.transactions?.[0];
   const bookingId = answer.orderDetails?.orderId ?? tx?.metadata?.bookingId;

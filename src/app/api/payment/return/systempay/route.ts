@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { confirmOrderPayment } from "@/lib/orders";
+import { prisma } from "@/lib/prisma";
 import {
   answerToEvent,
+  fetchSystempayPaidEvent,
   verifySystempayHash,
 } from "@/lib/payment/systempay-provider";
 
@@ -29,9 +31,38 @@ export async function POST(request: NextRequest) {
     typeof krHash !== "string" ||
     !verifySystempayHash(krAnswer, krHash, "sha256_hmac")
   ) {
-    console.error("Retour Systempay : signature invalide");
+    console.error(
+      "Retour Systempay : signature invalide (SYSTEMPAY_HMAC_KEY test/prod ?)",
+      { hasHmacKey: Boolean(process.env.SYSTEMPAY_HMAC_KEY) },
+    );
+    // Repli : on retrouve la commande via le jeton du lien de succès, puis on
+    // demande directement à Systempay (API authentifiée) si elle est payée.
+    try {
+      const ref = success
+        ? new URL(success, origin).searchParams.get("ref")
+        : null;
+      const booking = ref
+        ? await prisma.booking.findUnique({
+            where: { downloadToken: ref },
+            select: { id: true },
+          })
+        : null;
+      if (booking) {
+        const event = await fetchSystempayPaidEvent(booking.id);
+        if (event.type === "paid") {
+          await confirmOrderPayment({
+            bookingId: event.bookingId,
+            paymentRef: event.paymentRef,
+            provider: "systempay",
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Confirmation par API Systempay impossible", error);
+    }
+    // Le client a pu payer : on ne le renvoie pas vers le formulaire.
     return NextResponse.redirect(
-      new URL(sameOrigin(cancel) ?? "/commande", origin),
+      new URL(sameOrigin(success) ?? "/reservation/success", origin),
       303,
     );
   }
