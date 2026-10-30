@@ -13,10 +13,15 @@ import type { PaymentProvider } from "./types";
  * SYSTEMPAY_HMAC_KEY (vérification du retour navigateur).
  */
 function apiBase() {
-  return (process.env.SYSTEMPAY_API_URL ?? "https://api.systempay.fr").replace(
-    /\/$/,
-    "",
-  );
+  const raw = (process.env.SYSTEMPAY_API_URL ?? "")
+    .trim()
+    .replace(/^["']|["']$/g, "");
+  try {
+    // Ne garde que l'origine : ignore tout chemin saisi par erreur.
+    return new URL(raw || "https://api.systempay.fr").origin;
+  } catch {
+    return "https://api.systempay.fr";
+  }
 }
 
 function authHeader() {
@@ -100,8 +105,9 @@ export const systempayProvider: PaymentProvider = {
     );
 
     if (!response.ok) {
+      const body = await response.text().catch(() => "");
       throw new Error(
-        `Systempay : création du paiement impossible (${response.status}).`,
+        `Systempay : création du paiement impossible (${response.status}) sur ${apiBase()} : ${body.slice(0, 300)}`,
       );
     }
 
