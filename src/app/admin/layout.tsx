@@ -12,7 +12,6 @@ export const metadata = {
 const NAV = [
   { href: "/admin", label: "Commandes" },
   { href: "/admin/prestations", label: "Prestations" },
-  { href: "/admin/tarifs", label: "Tarifs" },
   { href: "/admin/horaires", label: "Horaires" },
 ];
 
@@ -25,7 +24,7 @@ export default function AdminLayout({
     <PageContainer>
       <div className="py-8">
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-[22px] bg-ardoise px-5 py-4 text-white">
-          <p className="font-semibold">Back-office All Services</p>
+          <p className="font-semibold">Back-office All Services Montagne</p>
           <nav className="flex flex-wrap gap-2">
             {NAV.map((item) => (
               <Link

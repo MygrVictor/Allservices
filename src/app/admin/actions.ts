@@ -30,26 +30,6 @@ function eurosToCents(value: FormDataEntryValue | null) {
   return Number.isFinite(n) && n >= 0 ? Math.round(n * 100) : null;
 }
 
-export async function savePrices(formData: FormData) {
-  await assertAdmin();
-  await loadSettings();
-  const catalog = PRODUCTS.map((product) => {
-    // Seules les prestations vacanciers sont gérées ici.
-    if (product.targetAudience !== "vacancier") return product;
-    const cents = eurosToCents(formData.get(`price:${product.code}`));
-    const priceCents = cents ?? product.priceCents;
-    return {
-      ...product,
-      priceCents,
-      active: formData.get(`active:${product.code}`) === "on",
-      pricePending: priceCents > 0 ? undefined : product.pricePending,
-    };
-  });
-  await saveSetting("catalog", catalog);
-  revalidatePath("/", "layout");
-  redirect("/admin/tarifs?ok=1");
-}
-
 const CATEGORIES = [
   "remise_cles",
   "etat_des_lieux",
