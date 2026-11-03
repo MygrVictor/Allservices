@@ -28,7 +28,7 @@ export default async function EspaceProPage({
       <section className="mx-auto max-w-sm py-16">
         <h1 className="text-3xl text-ardoise">Espace pro</h1>
         <p className="mt-2 text-sm text-slate-600">
-          Accès réservé à l&apos;équipe All Services.
+          Accès réservé à l&apos;équipe All Services Montagne.
         </p>
         <form
           action={login}

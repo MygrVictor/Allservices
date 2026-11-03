@@ -227,6 +227,12 @@ export default function CommandePage() {
                   "After payment, your PDF order form (in French) is downloadable and emailed to you.",
                 )}
               </p>
+              <p className="px-2 text-xs font-medium text-slate-600">
+                {t(
+                  "En cas de retrait en agence : une empreinte de carte bancaire est demandée comme caution du linge.",
+                  "For office collection: a card imprint is requested as a linen deposit.",
+                )}
+              </p>
             </aside>
           </div>
         </PageContainer>

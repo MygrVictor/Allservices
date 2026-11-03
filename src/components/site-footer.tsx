@@ -14,7 +14,7 @@ export function SiteFooter() {
           <div className="mb-3">
             <Image
               src="/brand/logo-allservices.png"
-              alt="All Services"
+              alt="All Services Montagne"
               width={160}
               height={44}
               className="h-9 w-auto object-contain"

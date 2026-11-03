@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     const creneau =
       payload.modeRecuperation === "livraison"
-        ? `Livraison entre ${SITE.deliveryWindow} (créneau planifié par All Services)`
+        ? `Livraison entre ${SITE.deliveryWindow} (créneau planifié par All Services Montagne)`
         : "Retrait en magasin pendant les heures d'ouverture";
 
     // Synchronise la fiche produit en base (nom/prix modifiés dans le back-office)
