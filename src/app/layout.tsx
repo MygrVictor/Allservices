@@ -34,8 +34,8 @@ const siteUrl =
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
+    icon: "/fav.ico",
+    shortcut: "/fav.ico",
     apple: "/brand/logo-allservices.png",
   },
   title: {
