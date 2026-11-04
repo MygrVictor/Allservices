@@ -33,6 +33,11 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/brand/logo-allservices.png",
+  },
   title: {
     default: "All Services Montagne",
     template: "%s | All Services Montagne",
