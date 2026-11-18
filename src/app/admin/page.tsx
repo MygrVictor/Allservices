@@ -5,7 +5,21 @@ import {
   Residence,
   TargetAudience,
 } from "@prisma/client";
-import { format } from "date-fns";
+import {
+  endOfDay,
+  endOfMonth,
+  endOfWeek,
+  endOfYear,
+  format,
+  startOfDay,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
+  subDays,
+  subMonths,
+  subWeeks,
+  subYears,
+} from "date-fns";
 import { fr } from "date-fns/locale";
 import { formatEuros } from "@/lib/catalog";
 import { prisma } from "@/lib/prisma";
@@ -20,10 +34,104 @@ type AdminPageProps = {
     residence?: string;
     audience?: string;
     page?: string;
+    periode?: string;
+    du?: string;
+    au?: string;
   };
 };
 
 const PAGE_SIZE = 50;
+
+const PERIODES = [
+  { key: "aujourdhui", label: "Aujourd'hui" },
+  { key: "hier", label: "Hier" },
+  { key: "semaine", label: "Cette semaine" },
+  { key: "semaine-derniere", label: "Semaine dernière" },
+  { key: "mois", label: "Ce mois-ci" },
+  { key: "mois-dernier", label: "Mois dernier" },
+  { key: "annee", label: "Cette année" },
+  { key: "annee-derniere", label: "Année dernière" },
+  { key: "tout", label: "Tout" },
+] as const;
+
+function parseDay(v?: string) {
+  if (!v || !/^\d{4}-\d{2}-\d{2}$/.test(v)) return undefined;
+  const d = new Date(`${v}T00:00:00`);
+  return Number.isNaN(d.getTime()) ? undefined : d;
+}
+
+function periodRange(
+  periode: string | undefined,
+  du?: string,
+  au?: string,
+): { from?: Date; to?: Date; label: string } {
+  const now = new Date();
+  const wk = { weekStartsOn: 1 as const };
+  const fromCustom = parseDay(du);
+  const toCustom = parseDay(au);
+  if (fromCustom || toCustom) {
+    return {
+      from: fromCustom ? startOfDay(fromCustom) : undefined,
+      to: toCustom ? endOfDay(toCustom) : undefined,
+      label: `${fromCustom ? format(fromCustom, "dd/MM/yyyy") : "…"} → ${
+        toCustom ? format(toCustom, "dd/MM/yyyy") : "…"
+      }`,
+    };
+  }
+  switch (periode) {
+    case "aujourdhui":
+      return { from: startOfDay(now), to: endOfDay(now), label: "Aujourd'hui" };
+    case "hier": {
+      const d = subDays(now, 1);
+      return { from: startOfDay(d), to: endOfDay(d), label: "Hier" };
+    }
+    case "semaine":
+      return {
+        from: startOfWeek(now, wk),
+        to: endOfWeek(now, wk),
+        label: "Cette semaine",
+      };
+    case "semaine-derniere": {
+      const d = subWeeks(now, 1);
+      return {
+        from: startOfWeek(d, wk),
+        to: endOfWeek(d, wk),
+        label: "Semaine dernière",
+      };
+    }
+    case "mois-dernier": {
+      const d = subMonths(now, 1);
+      return {
+        from: startOfMonth(d),
+        to: endOfMonth(d),
+        label: format(d, "MMMM yyyy", { locale: fr }),
+      };
+    }
+    case "annee":
+      return {
+        from: startOfYear(now),
+        to: endOfYear(now),
+        label: `Année ${format(now, "yyyy")}`,
+      };
+    case "annee-derniere": {
+      const d = subYears(now, 1);
+      return {
+        from: startOfYear(d),
+        to: endOfYear(d),
+        label: `Année ${format(d, "yyyy")}`,
+      };
+    }
+    case "tout":
+      return { label: "Depuis le début" };
+    case "mois":
+    default:
+      return {
+        from: startOfMonth(now),
+        to: endOfMonth(now),
+        label: format(now, "MMMM yyyy", { locale: fr }),
+      };
+  }
+}
 
 function pick<T extends string>(values: Record<string, T>, v?: string) {
   return v && (Object.values(values) as string[]).includes(v)
@@ -39,10 +147,25 @@ export default async function AdminOrdersPage({
   const audience = pick(TargetAudience, searchParams.audience);
   const date = searchParams.date;
   const page = Math.max(1, Number(searchParams.page) || 1);
+  const hasCustom = Boolean(searchParams.du || searchParams.au);
+  const periode = hasCustom ? "perso" : (searchParams.periode ?? "mois");
+  const range = periodRange(
+    searchParams.periode,
+    searchParams.du,
+    searchParams.au,
+  );
 
   const where: Prisma.BookingWhereInput = {
     // Seules les commandes payées (les paniers abandonnés restent cachés).
     status: BookingStatus.paid,
+    ...(range.from || range.to
+      ? {
+          createdAt: {
+            ...(range.from ? { gte: range.from } : {}),
+            ...(range.to ? { lte: range.to } : {}),
+          },
+        }
+      : {}),
     ...(residence ? { residence } : {}),
     ...(audience ? { targetAudience: audience } : {}),
     ...(date
@@ -64,7 +187,7 @@ export default async function AdminOrdersPage({
       : {}),
   };
 
-  const [bookings, count, totals] = await Promise.all([
+  const [bookings, count, totals, byStation] = await Promise.all([
     prisma.booking.findMany({
       where,
       include: { items: { include: { product: true } } },
@@ -74,7 +197,26 @@ export default async function AdminOrdersPage({
     }),
     prisma.booking.count({ where }),
     prisma.booking.aggregate({ where, _sum: { montantTotalCents: true } }),
+    prisma.booking.groupBy({
+      by: ["residence"],
+      where,
+      _sum: { montantTotalCents: true },
+      _count: { _all: true },
+    }),
   ]);
+
+  const ca = totals._sum.montantTotalCents ?? 0;
+  const panierMoyen = count > 0 ? Math.round(ca / count) : 0;
+
+  const periodeHref = (key: string) => {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (residence) params.set("residence", residence);
+    if (audience) params.set("audience", audience);
+    if (date) params.set("date", date);
+    params.set("periode", key);
+    return `/admin?${params.toString()}`;
+  };
 
   const pages = Math.max(1, Math.ceil(count / PAGE_SIZE));
   const pageHref = (p: number) => {
@@ -89,12 +231,96 @@ export default async function AdminOrdersPage({
   return (
     <section>
       <h1 className="text-3xl text-ardoise">Commandes</h1>
-      <p className="mt-2 text-slate-700">
-        {count} commande{count > 1 ? "s" : ""} ·{" "}
-        {formatEuros(totals._sum.montantTotalCents ?? 0)} au total
-      </p>
+
+      {/* Chiffre d'affaires par période */}
+      <div className="mt-6 rounded-[18px] border border-slate-200 bg-white p-4">
+        <div className="flex flex-wrap gap-2">
+          {PERIODES.map((p) => (
+            <Link
+              key={p.key}
+              href={periodeHref(p.key)}
+              className={`rounded-full border px-3 py-1.5 text-sm ${
+                periode === p.key
+                  ? "border-ardoise bg-ardoise text-white"
+                  : "border-slate-300 text-slate-700 hover:bg-slate-50"
+              }`}
+            >
+              {p.label}
+            </Link>
+          ))}
+        </div>
+        <form className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+          {q && <input type="hidden" name="q" value={q} />}
+          {residence && (
+            <input type="hidden" name="residence" value={residence} />
+          )}
+          {audience && <input type="hidden" name="audience" value={audience} />}
+          <span className="text-slate-600">Période personnalisée :</span>
+          <input
+            type="date"
+            name="du"
+            defaultValue={searchParams.du ?? ""}
+            className="rounded-lg border border-slate-300 px-2 py-1.5"
+          />
+          <span>→</span>
+          <input
+            type="date"
+            name="au"
+            defaultValue={searchParams.au ?? ""}
+            className="rounded-lg border border-slate-300 px-2 py-1.5"
+          />
+          <button className="rounded-lg bg-ardoise px-3 py-1.5 text-white">
+            Appliquer
+          </button>
+        </form>
+
+        <p className="mt-4 text-sm capitalize text-slate-600">{range.label}</p>
+        <div className="mt-2 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-xl bg-slate-50 p-4">
+            <p className="text-sm text-slate-600">
+              Chiffre d&apos;affaires TTC
+            </p>
+            <p className="text-2xl font-semibold text-ardoise">
+              {formatEuros(ca)}
+            </p>
+          </div>
+          <div className="rounded-xl bg-slate-50 p-4">
+            <p className="text-sm text-slate-600">Commandes payées</p>
+            <p className="text-2xl font-semibold text-ardoise">{count}</p>
+          </div>
+          <div className="rounded-xl bg-slate-50 p-4">
+            <p className="text-sm text-slate-600">Panier moyen</p>
+            <p className="text-2xl font-semibold text-ardoise">
+              {formatEuros(panierMoyen)}
+            </p>
+          </div>
+        </div>
+        {byStation.length > 0 && (
+          <ul className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-700">
+            {byStation.map((s) => (
+              <li key={s.residence}>
+                {residenceLabel(s.residence)} :{" "}
+                <strong>{formatEuros(s._sum.montantTotalCents ?? 0)}</strong> (
+                {s._count._all} cmd)
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="mt-2 text-xs text-slate-500">
+          Basé sur la date de paiement de la commande.
+        </p>
+      </div>
 
       <form className="mt-6 grid gap-3 rounded-[18px] border border-slate-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-5">
+        {periode !== "perso" && (
+          <input type="hidden" name="periode" value={periode} />
+        )}
+        {searchParams.du && (
+          <input type="hidden" name="du" value={searchParams.du} />
+        )}
+        {searchParams.au && (
+          <input type="hidden" name="au" value={searchParams.au} />
+        )}
         <input
           name="q"
           defaultValue={q ?? ""}
