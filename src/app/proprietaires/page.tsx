@@ -52,6 +52,7 @@ export default async function ProprietairesPage() {
         "Accueil + remise de clés illimité pendant la saison",
         "Unlimited guest welcome + key handover during the season",
       ),
+      price: t("380€", "€380"),
       description: t(
         "Nous accueillons vos locataires et gérons toutes les remises de clés de la saison.",
         "We welcome your tenants and handle every key handover throughout the season.",
@@ -64,6 +65,7 @@ export default async function ProprietairesPage() {
         "Accueil + remise de clés + état des lieux de sortie",
         "Guest welcome + key handover + check-out inspection",
       ),
+      price: t("65€", "€65"),
       description: t(
         "Remise des clés et vérification de la remise en état du logement .",
         "Key handover and verification of the property's condition .",
@@ -73,6 +75,7 @@ export default async function ProprietairesPage() {
     },
     {
       title: t("Ménage de fin de séjour", "End-of-stay cleaning"),
+      price: t("À partir de 65€", "from €65"),
       description: t(
         "Nettoyage complet du logement entre deux locations, prêt pour les prochains arrivants.",
         "Full cleaning of the property between lets, ready for the next guests.",
@@ -85,6 +88,7 @@ export default async function ProprietairesPage() {
         "Services laverie / blanchisserie",
         "Launderette / laundry services",
       ),
+      price: t("À partir de 18€", "from €18"),
       description: t(
         "Lavage, séchage et repassage de votre linge de lit et de toilette.",
         "Washing, drying and ironing of your bed and bath linen.",
@@ -318,6 +322,9 @@ export default async function ProprietairesPage() {
                         <h3 className="text-base font-semibold leading-snug text-ardoise">
                           {service.title}
                         </h3>
+                        <p className="mt-1 text-sm font-semibold text-sapin">
+                          {service.price}
+                        </p>
                         <p className="mt-2 flex-1 text-sm leading-6 text-slate-600">
                           {service.description}
                         </p>
@@ -329,8 +336,8 @@ export default async function ProprietairesPage() {
                 <p className="mt-6 flex items-center gap-2 rounded-lg border border-primary/15 bg-primary-light/50 px-4 py-3 text-sm text-ardoise">
                   <BriefcaseIcon className="h-4 w-4 shrink-0 text-sapin" />
                   {t(
-                    "Tarifs sur devis, selon votre logement et vos besoins.",
-                    "Prices on quote, depending on your property and needs.",
+                    "Tarifs indiqués ci-dessus (prestations à partir de 65€ et 18€ selon vos besoins).",
+                    "Prices shown above (some services start from €65 and €18 depending on your needs).",
                   )}
                 </p>
               </div>
