@@ -151,3 +151,39 @@ describe("buildOrderLines — calcul du total au paiement", () => {
     ).toBe(9900);
   });
 });
+
+describe("supplément journalier dès le 8e jour", () => {
+  const total = (code: string, dateDepart: string) =>
+    buildOrderLines({
+      ...base,
+      dateArrivee: "2026-12-01",
+      dateDepart,
+      items: [{ productCode: code, quantity: 1 }],
+    })!.totalCents;
+
+  it("n'ajoute rien jusqu'à 7 jours", () => {
+    expect(total("pack-housse-2p-serviettes", "2026-12-08")).toBe(
+      prix("pack-housse-2p-serviettes"),
+    );
+  });
+
+  it.each([
+    ["pack-housse-2p-serviettes", 500],
+    ["pack-draps-plats-2p", 500],
+    ["pack-housse-1p-serviette", 300],
+    ["pack-draps-plats-1p", 300],
+    ["kit-draps-2p", 400],
+    ["kit-housse-2p", 400],
+    ["kit-draps-1p", 200],
+    ["kit-housse-1p", 200],
+  ])("%s : +%i centimes par jour dès le 8e jour", (code, extra) => {
+    // 10 jours = 3 jours de supplément
+    expect(total(code, "2026-12-11")).toBe(prix(code) + extra * 3);
+  });
+
+  it("ne touche pas les produits sans supplément", () => {
+    expect(total("pack-serviettes", "2026-12-20")).toBe(
+      prix("pack-serviettes"),
+    );
+  });
+});

@@ -24,6 +24,9 @@ type CartContextValue = {
   add: (code: string) => void;
   remove: (code: string) => void;
   items: (CatalogProduct & { quantity: number })[];
+  dateArrivee: string;
+  dateDepart: string;
+  setDates: (dateArrivee: string, dateDepart: string) => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -31,9 +34,9 @@ const CartContext = createContext<CartContextValue | null>(null);
 /** Panier partagé entre les pages (vacanciers, location de ski, commande). */
 export function CartProvider({ children }: { children: ReactNode }) {
   const locale = useLocale();
-  const [quantities, setQuantitiesState] = useState<Record<string, number>>(
-    {},
-  );
+  const [quantities, setQuantitiesState] = useState<Record<string, number>>({});
+  const [dateArrivee, setDateArrivee] = useState("");
+  const [dateDepart, setDateDepart] = useState("");
 
   useEffect(() => {
     try {
@@ -78,9 +81,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [quantities, locale],
   );
 
+  const setDates = useCallback((arrival: string, departure: string) => {
+    setDateArrivee(arrival);
+    setDateDepart(departure);
+  }, []);
+
   return (
     <CartContext.Provider
-      value={{ quantities, setQuantities, add, remove, items }}
+      value={{
+        quantities,
+        setQuantities,
+        add,
+        remove,
+        items,
+        dateArrivee,
+        dateDepart,
+        setDates,
+      }}
     >
       {children}
     </CartContext.Provider>

@@ -2,11 +2,18 @@ import {
   DELIVERY_PRODUCT_CODE,
   PRODUCTS,
   isOrderable,
+  stayDays,
+  unitPriceForStay,
   type CatalogProduct,
 } from "@/lib/catalog";
 import type { CheckoutPayload } from "@/lib/validation";
 
-export type CartLine = { product: CatalogProduct; quantity: number };
+export type CartLine = {
+  product: CatalogProduct;
+  quantity: number;
+  /** Prix unitaire pour la durée du séjour (supplément jours inclus). */
+  unitPriceCents: number;
+};
 
 /**
  * Construit les lignes de commande et le total À PARTIR DU CATALOGUE SERVEUR.
@@ -14,11 +21,13 @@ export type CartLine = { product: CatalogProduct; quantity: number };
  * Renvoie null si un produit n'est pas commandable.
  */
 export function buildOrderLines(
-  payload: Pick<CheckoutPayload, "items" | "residence" | "modeRecuperation">,
+  payload: Pick<CheckoutPayload, "items" | "residence" | "modeRecuperation"> &
+    Partial<Pick<CheckoutPayload, "dateArrivee" | "dateDepart">>,
   catalog: CatalogProduct[] = PRODUCTS,
 ): { lines: CartLine[]; totalCents: number } | null {
   const catalogMap = new Map(catalog.map((p) => [p.code, p]));
   const lines: CartLine[] = [];
+  const days = stayDays(payload.dateArrivee, payload.dateDepart);
 
   for (const item of payload.items) {
     const product = catalogMap.get(item.productCode);
@@ -31,16 +40,26 @@ export function buildOrderLines(
     ) {
       return null;
     }
-    lines.push({ product, quantity: item.quantity });
+    lines.push({
+      product,
+      quantity: item.quantity,
+      unitPriceCents: unitPriceForStay(product, days),
+    });
   }
 
   if (payload.modeRecuperation === "livraison") {
     const delivery = catalogMap.get(DELIVERY_PRODUCT_CODE);
-    if (delivery) lines.push({ product: delivery, quantity: 1 });
+    if (delivery) {
+      lines.push({
+        product: delivery,
+        quantity: 1,
+        unitPriceCents: delivery.priceCents,
+      });
+    }
   }
 
   const totalCents = lines.reduce(
-    (sum, line) => sum + line.product.priceCents * line.quantity,
+    (sum, line) => sum + line.unitPriceCents * line.quantity,
     0,
   );
   return { lines, totalCents };

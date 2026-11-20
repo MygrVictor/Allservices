@@ -80,6 +80,11 @@ export function CartSummary({
                 {formatEuros(total)}
               </span>
             </div>
+            <p className="mt-2 text-xs text-slate-600">
+              Forfait minimum de 7 jours, même pour un séjour plus court. Au-delà, un supplément par jour s&apos;applique
+              dès le 8e jour sur certains articles (calculé à la commande selon
+              vos dates).
+            </p>
           </div>
         </>
       )}

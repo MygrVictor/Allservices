@@ -332,14 +332,6 @@ export default async function ProprietairesPage() {
                     </article>
                   ))}
                 </div>
-
-                <p className="mt-6 flex items-center gap-2 rounded-lg border border-primary/15 bg-primary-light/50 px-4 py-3 text-sm text-ardoise">
-                  <BriefcaseIcon className="h-4 w-4 shrink-0 text-sapin" />
-                  {t(
-                    "Tarifs indiqués ci-dessus (prestations à partir de 65€ et 18€ selon vos besoins).",
-                    "Prices shown above (some services start from €65 and €18 depending on your needs).",
-                  )}
-                </p>
               </div>
 
               <div className="rounded-panel border border-primary/10 bg-white p-6 shadow-soft">

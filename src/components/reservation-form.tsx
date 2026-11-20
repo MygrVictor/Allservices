@@ -1,17 +1,20 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import {
   AMBIGUOUS_PRODUCT,
   AMBIGUOUS_PRODUCT_EN,
   DELIVERY_PRODUCT_CODE,
+  INCLUDED_RENTAL_DAYS,
   PRODUCTS,
   formatEuros,
   isOrderable,
   localizeProduct,
   productsForAudience,
   residenceOptions,
+  stayDays,
+  unitPriceForStay,
   type CatalogProduct,
   type Residence,
 } from "@/lib/catalog";
@@ -19,6 +22,7 @@ import { siteText } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { makeT, type Translate } from "@/lib/i18n";
+import { useCart } from "@/components/cart-provider";
 
 type PickupMode = "retrait" | "livraison";
 
@@ -101,6 +105,12 @@ export function ReservationForm({
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
+  const { setDates } = useCart();
+
+  useEffect(() => {
+    setDates(data.dateArrivee, data.dateDepart);
+  }, [data.dateArrivee, data.dateDepart, setDates]);
+
   const rawDelivery = PRODUCTS.find((p) => p.code === DELIVERY_PRODUCT_CODE);
   const deliveryProduct = rawDelivery
     ? localizeProduct(rawDelivery, locale)
@@ -138,9 +148,10 @@ export function ReservationForm({
     data.modeRecuperation === "livraison"
       ? (deliveryProduct?.priceCents ?? 0)
       : 0;
+  const days = stayDays(data.dateArrivee, data.dateDepart);
   const totalCents =
     selectedItems.reduce(
-      (sum, item) => sum + item.priceCents * item.quantity,
+      (sum, item) => sum + unitPriceForStay(item, days) * item.quantity,
       0,
     ) + deliveryCents;
 
@@ -282,7 +293,10 @@ export function ReservationForm({
     <form
       onSubmit={submit}
       noValidate
-      className="rounded-panel border border-slate-200 bg-white p-4 shadow-soft sm:p-6"
+      className={cn(
+        "relative rounded-panel border border-slate-200 bg-white p-4 shadow-soft sm:p-6",
+        !cartMode && "lg:pr-[344px]",
+      )}
     >
       <ol
         className="mb-6 flex flex-wrap gap-2 text-xs"
@@ -400,9 +414,17 @@ export function ReservationForm({
                     <div className="min-w-0">
                       <p className="font-medium text-ardoise">{item.name}</p>
                       <p className="text-sm font-semibold text-primary">
-                        {eur(item.priceCents)} × {item.quantity} ={" "}
-                        {eur(item.priceCents * item.quantity)}
+                        {eur(unitPriceForStay(item, days))} × {item.quantity} ={" "}
+                        {eur(unitPriceForStay(item, days) * item.quantity)}
                       </p>
+                      {item.extraDayCents && days > INCLUDED_RENTAL_DAYS ? (
+                        <p className="text-xs text-slate-600">
+                          {t(
+                            `dont ${eur(item.extraDayCents)} / jour supplémentaire dès le 8e jour (${days - INCLUDED_RENTAL_DAYS} j)`,
+                            `incl. ${eur(item.extraDayCents)} / extra day from day 8 (${days - INCLUDED_RENTAL_DAYS} d)`,
+                          )}
+                        </p>
+                      ) : null}
                     </div>
                     <div className="flex shrink-0 items-center gap-1">
                       <button
@@ -502,6 +524,14 @@ export function ReservationForm({
                                 : (product.pricePending ??
                                   t("Bientôt disponible", "Coming soon"))}
                           </p>
+                          {orderable && product.extraDayCents ? (
+                            <p className="text-xs text-slate-600">
+                              {t(
+                                `Forfait minimum de 7 jours, puis +${eur(product.extraDayCents)} par jour dès le 8e jour`,
+                                `7-day minimum rental, then +${eur(product.extraDayCents)} per day from day 8`,
+                              )}
+                            </p>
+                          ) : null}
                         </div>
                         {orderable && !isSkiPack ? (
                           <div className="flex shrink-0 items-center gap-1">
@@ -792,7 +822,7 @@ export function ReservationForm({
                   {item.name} ×{item.quantity}
                 </span>
                 <span className="font-medium">
-                  {eur(item.priceCents * item.quantity)}
+                  {eur(unitPriceForStay(item, days) * item.quantity)}
                 </span>
               </li>
             ))}
@@ -813,6 +843,80 @@ export function ReservationForm({
             )}
           </p>
         </div>
+      )}
+
+      {!cartMode && (
+        <aside className="mt-6 lg:absolute lg:right-6 lg:top-24 lg:mt-0 lg:w-[296px]">
+          <div className="rounded-panel border border-accent/50 bg-gradient-to-br from-accent/10 to-white p-5 shadow-soft">
+            <p className="text-lg font-semibold text-ardoise">
+              {t("Votre prix en temps réel", "Your live price")}
+            </p>
+            <p className="mt-1 text-sm text-slate-600">
+              {days > 0
+                ? t(
+                    `${days} jour${days > 1 ? "s" : ""} de séjour`,
+                    `${days} day${days > 1 ? "s" : ""} of stay`,
+                  )
+                : t("Choisissez vos dates", "Choose your dates")}
+            </p>
+
+            <ul className="mt-4 space-y-2 border-y border-slate-200 py-3 text-sm">
+              {selectedItems.map((item) => {
+                const unit = unitPriceForStay(item, days);
+                return (
+                  <li key={item.code} className="flex justify-between gap-3">
+                    <span className="text-slate-700">
+                      {item.name} ×{item.quantity}
+                    </span>
+                    <span className="font-semibold text-ardoise">
+                      {eur(unit * item.quantity)}
+                    </span>
+                  </li>
+                );
+              })}
+              {selectedItems.length === 0 && (
+                <li className="text-slate-500">
+                  {t("Aucun article sélectionné", "No item selected")}
+                </li>
+              )}
+              {deliveryCents > 0 && (
+                <li className="flex justify-between gap-3">
+                  <span className="text-slate-700">
+                    {deliveryProduct?.name}
+                  </span>
+                  <span className="font-semibold text-ardoise">
+                    {eur(deliveryCents)}
+                  </span>
+                </li>
+              )}
+            </ul>
+
+            <div className="mt-4 flex items-end justify-between gap-3">
+              <div>
+                <p className="text-sm text-slate-600">{t("Total", "Total")}</p>
+                {days > 0 && days < INCLUDED_RENTAL_DAYS && (
+                  <p className="mt-1 max-w-[150px] text-xs text-slate-600">
+                    {t(
+                      "Forfait minimum de 7 jours facturé",
+                      "7-day minimum rental billed",
+                    )}
+                  </p>
+                )}
+                {days > INCLUDED_RENTAL_DAYS && (
+                  <p className="mt-1 max-w-[150px] text-xs text-slate-600">
+                    {t(
+                      `${days - INCLUDED_RENTAL_DAYS} jour${days - INCLUDED_RENTAL_DAYS > 1 ? "s" : ""} supplémentaire${days - INCLUDED_RENTAL_DAYS > 1 ? "s" : ""}`,
+                      `${days - INCLUDED_RENTAL_DAYS} extra day${days - INCLUDED_RENTAL_DAYS > 1 ? "s" : ""}`,
+                    )}
+                  </p>
+                )}
+              </div>
+              <p className="text-2xl font-bold text-accent">
+                {eur(totalCents)}
+              </p>
+            </div>
+          </div>
+        </aside>
       )}
 
       {error && (

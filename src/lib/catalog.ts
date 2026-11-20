@@ -17,6 +17,11 @@ export type CatalogProduct = {
   name: string;
   description: string;
   priceCents: number;
+  /**
+   * Supplément par jour de location au-delà de INCLUDED_RENTAL_DAYS
+   * (le prix de base couvre 7 jours).
+   */
+  extraDayCents?: number;
   targetAudience: Audience;
   category: ProductCategory;
   active: boolean;
@@ -35,6 +40,27 @@ export type CatalogProduct = {
   /** Photo de la prestation (URL, ex. /api/images/xxx). */
   photo?: string;
 };
+
+/** Nombre de jours de location couverts par le prix de base. */
+export const INCLUDED_RENTAL_DAYS = 7;
+
+/** Durée du séjour en jours (départ - arrivée). 0 si dates invalides. */
+export function stayDays(dateArrivee?: string, dateDepart?: string): number {
+  if (!dateArrivee || !dateDepart) return 0;
+  const a = new Date(dateArrivee).getTime();
+  const d = new Date(dateDepart).getTime();
+  if (Number.isNaN(a) || Number.isNaN(d) || d <= a) return 0;
+  return Math.round((d - a) / 86_400_000);
+}
+
+/** Prix unitaire pour la durée du séjour (base + supplément dès le 8e jour). */
+export function unitPriceForStay(
+  product: Pick<CatalogProduct, "priceCents" | "extraDayCents">,
+  days: number,
+): number {
+  const extraDays = Math.max(0, days - INCLUDED_RENTAL_DAYS);
+  return product.priceCents + (product.extraDayCents ?? 0) * extraDays;
+}
 
 export const PRODUCTS: CatalogProduct[] = [
   {
@@ -57,6 +83,7 @@ export const PRODUCTS: CatalogProduct[] = [
   },
   {
     code: "kit-draps-1p",
+    extraDayCents: 200,
     name: "Kit draps 1 pers.",
     description: "Drap housse, drap plat et taie pour lit simple.",
     priceCents: 2000,
@@ -66,6 +93,7 @@ export const PRODUCTS: CatalogProduct[] = [
   },
   {
     code: "kit-draps-2p",
+    extraDayCents: 400,
     name: "Kit draps 2 pers.",
     description: "Drap housse, drap plat et taies pour lit double.",
     priceCents: 2800,
@@ -75,6 +103,7 @@ export const PRODUCTS: CatalogProduct[] = [
   },
   {
     code: "kit-housse-1p",
+    extraDayCents: 200,
     name: "Kit housse de couette 1 pers. sans serviettes",
     description: "Housse de couette + taie, sans linge de bain.",
     priceCents: 2000,
@@ -84,6 +113,7 @@ export const PRODUCTS: CatalogProduct[] = [
   },
   {
     code: "kit-housse-2p",
+    extraDayCents: 400,
     name: "Kit housse de couette 2 pers. sans serviettes",
     description: "Housse de couette double + taies, sans serviettes.",
     priceCents: 2800,
@@ -93,6 +123,7 @@ export const PRODUCTS: CatalogProduct[] = [
   },
   {
     code: "pack-housse-1p-serviette",
+    extraDayCents: 300,
     name: "Pack housse de couette + 1 serviette (1 pers.)",
     description:
       " 1 housse de couette 1 pers., 1 drap housse, 1 taie d'oreiller, 1 serviette de toilette.",
@@ -103,6 +134,7 @@ export const PRODUCTS: CatalogProduct[] = [
   },
   {
     code: "pack-housse-2p-serviettes",
+    extraDayCents: 500,
     name: "Pack housse de couette + 2 serviettes (2 pers.)",
     description:
       " 1 housse de couette 2 pers., 1 drap housse 2 pers., 2 taies d'oreiller, 2 serviettes de toilette.",
@@ -113,6 +145,7 @@ export const PRODUCTS: CatalogProduct[] = [
   },
   {
     code: "pack-draps-plats-1p",
+    extraDayCents: 300,
     name: "Pack draps plats + 1 serviette (1 pers.)",
     description:
       " 1 drap plat (dessous), 1 drap plat (dessus), 1 taie d'oreiller, 1 serviette de toilette.",
@@ -123,6 +156,7 @@ export const PRODUCTS: CatalogProduct[] = [
   },
   {
     code: "pack-draps-plats-2p",
+    extraDayCents: 500,
     name: "Pack draps plats + 2 serviettes (2 pers.)",
     description:
       "2 draps plats 2 pers. (dessous + dessus), 2 taies d'oreiller, 2 serviettes de toilette.",

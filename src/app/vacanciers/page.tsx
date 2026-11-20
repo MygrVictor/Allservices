@@ -134,6 +134,14 @@ export default function VacanciersPage() {
                 {product.pricePending ??
                   formatEuros(product.priceCents, locale)}
               </span>
+              {!product.pricePending && product.extraDayCents ? (
+                <span className="mt-0.5 block text-xs font-normal text-slate-600">
+                  {t(
+                    `Forfait minimum de 7 jours, puis +${formatEuros(product.extraDayCents, locale)} par jour dès le 8e jour`,
+                    `7-day minimum rental, then +${formatEuros(product.extraDayCents, locale)} per day from day 8`,
+                  )}
+                </span>
+              ) : null}
             </div>
             <button
               onClick={() => !isSkiPack && addToCart(product.code)}

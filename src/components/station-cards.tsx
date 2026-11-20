@@ -16,6 +16,11 @@ const GALLERY: Record<string, { src: string; fr: string; en: string }[]> = {
       fr: "Galerie de l'agence",
       en: "Office gallery",
     },
+    {
+      src: "/stations/arc1800/interieur_conciergerie_arc1800.jpg",
+      fr: "Intérieur de la conciergerie",
+      en: "Inside the concierge office",
+    },
   ],
   arc_2000: [
     {

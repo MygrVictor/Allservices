@@ -7,15 +7,25 @@ import { ReservationForm } from "@/components/reservation-form";
 import { useCart } from "@/components/cart-provider";
 import { useLocale } from "@/components/locale-provider";
 import { makeT } from "@/lib/i18n";
-import { formatEuros } from "@/lib/catalog";
+import {
+  INCLUDED_RENTAL_DAYS,
+  formatEuros,
+  stayDays,
+  unitPriceForStay,
+} from "@/lib/catalog";
 import { SITE } from "@/lib/site-config";
 
 export default function CommandePage() {
   const locale = useLocale();
   const t = makeT(locale);
-  const { quantities, setQuantities, items } = useCart();
+  const { quantities, setQuantities, items, dateArrivee, dateDepart } =
+    useCart();
   const count = items.reduce((s, i) => s + i.quantity, 0);
-  const total = items.reduce((s, i) => s + i.priceCents * i.quantity, 0);
+  const days = stayDays(dateArrivee, dateDepart);
+  const total = items.reduce(
+    (s, i) => s + unitPriceForStay(i, days) * i.quantity,
+    0,
+  );
 
   const journey = [
     { label: t("Panier", "Basket"), done: true },
@@ -166,6 +176,19 @@ export default function CommandePage() {
                       {count}
                     </span>
                   </div>
+                  <div className="px-5 pt-4">
+                    <p className="text-sm font-semibold text-ardoise">
+                      {t("Votre prix en temps réel", "Your live price")}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-600">
+                      {days > 0
+                        ? t(
+                            `${days} jour${days > 1 ? "s" : ""} de séjour`,
+                            `${days} day${days > 1 ? "s" : ""} of stay`,
+                          )
+                        : t("Choisissez vos dates", "Choose your dates")}
+                    </p>
+                  </div>
                   <ul className="divide-y divide-slate-100 px-5">
                     {items.map((item) => (
                       <li
@@ -179,7 +202,10 @@ export default function CommandePage() {
                           {item.name}
                         </span>
                         <span className="shrink-0 font-semibold text-ardoise">
-                          {formatEuros(item.priceCents * item.quantity, locale)}
+                          {formatEuros(
+                            unitPriceForStay(item, days) * item.quantity,
+                            locale,
+                          )}
                         </span>
                       </li>
                     ))}
@@ -190,6 +216,22 @@ export default function CommandePage() {
                       {formatEuros(total, locale)}
                     </span>
                   </div>
+                  {days > 0 && days < INCLUDED_RENTAL_DAYS && (
+                    <p className="px-5 pb-2 text-xs text-slate-600">
+                      {t(
+                        "Forfait minimum de 7 jours facturé",
+                        "7-day minimum rental billed",
+                      )}
+                    </p>
+                  )}
+                  {days > INCLUDED_RENTAL_DAYS && (
+                    <p className="px-5 pb-2 text-xs text-slate-600">
+                      {t(
+                        `${days - INCLUDED_RENTAL_DAYS} jours supplémentaires`,
+                        `${days - INCLUDED_RENTAL_DAYS} extra days`,
+                      )}
+                    </p>
+                  )}
                   <div className="flex gap-3 px-5 pb-4 pt-1 text-xs font-semibold">
                     <Link
                       href="/vacanciers#produits"

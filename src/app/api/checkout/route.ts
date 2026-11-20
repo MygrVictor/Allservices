@@ -81,9 +81,9 @@ export async function POST(request: NextRequest) {
         notes: payload.notes,
         paymentProvider: provider.id,
         items: {
-          create: lines.map(({ product, quantity }) => ({
+          create: lines.map(({ product, quantity, unitPriceCents }) => ({
             quantity,
-            unitPriceCents: product.priceCents,
+            unitPriceCents,
             product: { connect: { code: product.code } },
           })),
         },
@@ -99,10 +99,10 @@ export async function POST(request: NextRequest) {
       customerFirstName: firstName,
       customerLastName: rest.join(" "),
       totalCents: total,
-      items: lines.map(({ product, quantity }) => ({
+      items: lines.map(({ product, quantity, unitPriceCents }) => ({
         name: product.name,
         description: product.description,
-        unitAmountCents: product.priceCents,
+        unitAmountCents: unitPriceCents,
         quantity,
       })),
       successUrl: `${origin}/reservation/success?ref=${booking.downloadToken}`,

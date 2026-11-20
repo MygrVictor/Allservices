@@ -112,6 +112,7 @@ export async function saveProduct(formData: FormData) {
     nameEn: text("nameEn") || undefined,
     descriptionEn: text("descriptionEn") || undefined,
     priceCents,
+    extraDayCents: eurosToCents(formData.get("extraDay")) || undefined,
     targetAudience,
     category,
     active: formData.get("active") === "on",

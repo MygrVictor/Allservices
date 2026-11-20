@@ -160,6 +160,22 @@ export default async function AdminProductEditPage({
             />
           </label>
           <label className="block text-sm">
+            <span className="font-semibold text-ardoise">
+              Supplément par jour dès le 8e jour (€)
+            </span>
+            <input
+              name="extraDay"
+              type="number"
+              min="0"
+              step="0.01"
+              defaultValue={((p.extraDayCents ?? 0) / 100).toFixed(2)}
+              className={input}
+            />
+            <span className="mt-1 block text-xs text-slate-500">
+              Le prix ci-dessus couvre 7 jours. 0 = pas de supplément.
+            </span>
+          </label>
+          <label className="block text-sm">
             <span className="font-semibold text-ardoise">Catégorie *</span>
             <select name="category" defaultValue={p.category} className={input}>
               {Object.entries(CATEGORY_LABEL).map(([value, label]) => (

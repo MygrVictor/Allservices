@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CatalogProduct, formatEuros } from "@/lib/catalog";
+import {
+  CatalogProduct,
+  formatEuros,
+  stayDays,
+  unitPriceForStay,
+} from "@/lib/catalog";
+import { useCart } from "@/components/cart-provider";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { makeT } from "@/lib/i18n";
@@ -23,8 +29,10 @@ export function CartDrawer({
   const locale = useLocale();
   const t = makeT(locale);
   const count = items.reduce((sum, item) => sum + item.quantity, 0);
+  const { dateArrivee, dateDepart } = useCart();
+  const days = stayDays(dateArrivee, dateDepart);
   const total = items.reduce(
-    (sum, item) => sum + item.priceCents * item.quantity,
+    (sum, item) => sum + unitPriceForStay(item, days) * item.quantity,
     0,
   );
 
@@ -122,7 +130,11 @@ export function CartDrawer({
                       {item.name}
                     </p>
                     <p className="text-xs text-slate-600">
-                      {formatEuros(item.priceCents, locale)}
+                      {formatEuros(
+                        unitPriceForStay(item, days) * item.quantity,
+                        locale,
+                      )}
+                      {days > 0 && <span className="ml-1">· {days} j</span>}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -162,6 +174,25 @@ export function CartDrawer({
               {formatEuros(total, locale)}
             </span>
           </div>
+          {days > 0 && days < 7 && (
+            <p className="-mt-2 mb-4 text-xs text-slate-600">
+              {t(
+                "Forfait minimum de 7 jours facturé",
+                "7-day minimum rental billed",
+              )}
+            </p>
+          )}
+          {days > 7 && (
+            <p className="-mt-2 mb-4 text-xs text-slate-600">
+              {t(`${days - 7} jours supplémentaires`, `${days - 7} extra days`)}
+            </p>
+          )}
+          <p className="-mt-2 mb-4 text-xs text-slate-600">
+            {t(
+              "Forfait minimum de 7 jours, même pour un séjour plus court. Au-delà, un supplément par jour s'applique dès le 8e jour sur certains articles (calculé à la commande selon vos dates).",
+              "7-day minimum rental. Beyond that, some items have a per-day supplement from day 8.",
+            )}
+          </p>
           <a
             href={checkoutHref}
             onClick={() => setOpen(false)}
