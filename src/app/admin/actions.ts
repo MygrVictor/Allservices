@@ -64,12 +64,16 @@ export async function saveProduct(formData: FormData) {
   const priceCents = eurosToCents(formData.get("price"));
   const existingCode = text("code");
 
+  const isSki = category === "ski";
+  const errorPath = (flag: string) =>
+    `/admin/prestations/${existingCode || "nouvelle"}?erreur=${flag}${isSki ? "&type=ski" : ""}`;
+
   if (
     name.length < 2 ||
     !CATEGORIES.includes(category as (typeof CATEGORIES)[number]) ||
     priceCents === null
   ) {
-    redirect(`/admin/prestations/${existingCode || "nouvelle"}?erreur=1`);
+    redirect(errorPath("1"));
   }
 
   const residence = text("residence");
@@ -85,19 +89,19 @@ export async function saveProduct(formData: FormData) {
   const file = formData.get("photo");
   if (file instanceof File && file.size > 0) {
     if (!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size > 5_000_000) {
-      redirect(`/admin/prestations/${existingCode || "nouvelle"}?erreur=photo`);
+      redirect(errorPath("photo"));
     }
     try {
       photo = await storeImage(Buffer.from(await file.arrayBuffer()));
     } catch (error) {
       console.error("Photo illisible", error);
-      redirect(`/admin/prestations/${existingCode || "nouvelle"}?erreur=photo`);
+      redirect(errorPath("photo"));
     }
   }
 
   let code = existing?.code;
   if (!code) {
-    const base = slugify(name) || "prestation";
+    const base = `${isSki ? "ski-" : ""}${slugify(name) || "prestation"}`;
     code = base;
     let i = 2;
     while (code === "nouvelle" || PRODUCTS.some((p) => p.code === code)) {
@@ -112,16 +116,23 @@ export async function saveProduct(formData: FormData) {
     nameEn: text("nameEn") || undefined,
     descriptionEn: text("descriptionEn") || undefined,
     priceCents,
-    extraDayCents: eurosToCents(formData.get("extraDay")) || undefined,
+    // Le ski se facture au jour (tarif 6 jours ÷ 6) : pas de supplément 8e jour.
+    extraDayCents: isSki
+      ? undefined
+      : eurosToCents(formData.get("extraDay")) || undefined,
     targetAudience,
     category,
     active: formData.get("active") === "on",
-    residence:
-      residence === "arc_1800" || residence === "arc_2000"
+    // Station : toujours choisie par le client au paiement (pack valable aux
+    // deux stations). On conserve une éventuelle restriction existante.
+    residence: isSki
+      ? undefined
+      : residence === "arc_1800" || residence === "arc_2000"
         ? residence
-        : undefined,
-    skier: skier === "adulte" || skier === "enfant" ? skier : undefined,
-    pricePending: pricePending || undefined,
+        : existing?.residence,
+    skier:
+      isSki && (skier === "adulte" || skier === "enfant") ? skier : undefined,
+    pricePending: isSki ? undefined : pricePending || undefined,
     photo,
   };
 

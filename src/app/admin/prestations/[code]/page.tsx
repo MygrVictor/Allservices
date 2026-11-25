@@ -4,6 +4,7 @@ import {
   DELIVERY_PRODUCT_CODE,
   englishFor,
   PRODUCTS,
+  skiPriceForDays,
   type CatalogProduct,
 } from "@/lib/catalog";
 import { loadSettings } from "@/lib/settings";
@@ -19,7 +20,7 @@ export default async function AdminProductEditPage({
   searchParams,
 }: {
   params: { code: string };
-  searchParams: { erreur?: string };
+  searchParams: { erreur?: string; type?: string };
 }) {
   await loadSettings();
   const isNew = params.code === "nouvelle";
@@ -28,14 +29,16 @@ export default async function AdminProductEditPage({
   );
   if (!isNew && !found) notFound();
 
+  const isSki = found ? found.category === "ski" : searchParams.type === "ski";
   const p: CatalogProduct = found ?? {
     code: "",
     name: "",
     description: "",
     priceCents: 0,
     targetAudience: "vacancier",
-    category: "linge",
+    category: isSki ? "ski" : "linge",
     active: true,
+    skier: isSki ? "adulte" : undefined,
   };
   const en = found ? englishFor(found) : { name: "", description: "" };
 
@@ -48,14 +51,19 @@ export default async function AdminProductEditPage({
         ← Toutes les prestations
       </Link>
       <h1 className="mt-3 text-3xl text-ardoise">
-        {isNew ? "Nouvelle prestation" : p.name}
+        {isNew ? (isSki ? "Nouveau pack ski" : "Nouvelle prestation") : p.name}
       </h1>
+      <p className="mt-1 text-sm text-slate-600">
+        {isSki
+          ? "Pack de location de ski (retirable à la station choisie au paiement)."
+          : "Prestation de linge ou de services (forfait 7 jours)."}
+      </p>
 
       {searchParams.erreur && (
         <p className="mt-4 rounded-lg bg-red-100 px-4 py-2 text-sm text-red-800">
           {searchParams.erreur === "photo"
             ? "Photo refusée : formats JPG, PNG ou WebP, 5 Mo maximum."
-            : "Vérifiez le nom (2 caractères min.), le prix et la catégorie."}
+            : "Vérifiez le nom (2 caractères min.) et le prix."}
         </p>
       )}
 
@@ -64,6 +72,7 @@ export default async function AdminProductEditPage({
         className="mt-6 space-y-5 rounded-[18px] border border-slate-200 bg-white p-5"
       >
         <input type="hidden" name="code" value={p.code} />
+        {isSki && <input type="hidden" name="category" value="ski" />}
 
         <div className="flex flex-wrap items-start gap-4">
           <div className="flex h-32 w-44 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 text-xs text-slate-400">
@@ -120,7 +129,11 @@ export default async function AdminProductEditPage({
               name="description"
               rows={3}
               defaultValue={p.description}
-              placeholder="Ex. : Drap housse, drap plat et 2 taies pour lit double."
+              placeholder={
+                isSki
+                  ? "Ex. : Skis + chaussures + bâtons pour débutants."
+                  : "Ex. : Drap housse, drap plat et 2 taies pour lit double."
+              }
               className={input}
             />
           </label>
@@ -146,94 +159,108 @@ export default async function AdminProductEditPage({
           </label>
         </fieldset>
 
-        <fieldset className="grid gap-4 sm:grid-cols-2">
-          <label className="block text-sm">
-            <span className="font-semibold text-ardoise">Prix TTC (€) *</span>
-            <input
-              name="price"
-              type="number"
-              min="0"
-              step="0.01"
-              required
-              defaultValue={(p.priceCents / 100).toFixed(2)}
-              className={input}
-            />
-          </label>
-          <label className="block text-sm">
-            <span className="font-semibold text-ardoise">
-              Supplément par jour dès le 8e jour (€)
-            </span>
-            <input
-              name="extraDay"
-              type="number"
-              min="0"
-              step="0.01"
-              defaultValue={((p.extraDayCents ?? 0) / 100).toFixed(2)}
-              className={input}
-            />
-            <span className="mt-1 block text-xs text-slate-500">
-              Le prix ci-dessus couvre 7 jours. 0 = pas de supplément.
-            </span>
-          </label>
-          <label className="block text-sm">
-            <span className="font-semibold text-ardoise">Catégorie *</span>
-            <select name="category" defaultValue={p.category} className={input}>
-              {Object.entries(CATEGORY_LABEL).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </fieldset>
-
-        <details
-          className="rounded-lg border border-slate-200 p-4 text-sm"
-          open={p.category === "ski"}
-        >
-          <summary className="cursor-pointer font-semibold text-ardoise">
-            Options avancées (packs ski, tarif en attente)
-          </summary>
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
-            <label className="block">
-              <span className="text-slate-600">Station</span>
-              <select
-                name="residence"
-                defaultValue={p.residence ?? ""}
-                className={input}
-              >
-                <option value="">Les deux stations</option>
-                <option value="arc_1800">Arc 1800 uniquement</option>
-                <option value="arc_2000">Arc 2000 uniquement</option>
-              </select>
-            </label>
-            <label className="block">
-              <span className="text-slate-600">Pack ski pour</span>
-              <select
-                name="skier"
-                defaultValue={p.skier ?? ""}
-                className={input}
-              >
-                <option value="">—</option>
-                <option value="adulte">Adulte</option>
-                <option value="enfant">Enfant</option>
-              </select>
-            </label>
-            <label className="block">
-              <span className="text-slate-600">Texte « tarif en attente »</span>
-              <input
-                name="pricePending"
-                defaultValue={p.pricePending ?? ""}
-                placeholder="Ex. : Tarif à confirmer"
-                className={input}
-              />
-            </label>
-          </div>
-          <p className="mt-2 text-xs text-slate-500">
-            Si un texte « tarif en attente » est renseigné, la prestation est
-            affichée mais ne peut pas être commandée.
-          </p>
-        </details>
+        {isSki ? (
+          <>
+            <fieldset className="grid gap-4 sm:grid-cols-2">
+              <label className="block text-sm">
+                <span className="font-semibold text-ardoise">
+                  Prix TTC pour 6 jours (€) *
+                </span>
+                <input
+                  name="price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  required
+                  defaultValue={(p.priceCents / 100).toFixed(2)}
+                  className={input}
+                />
+                <span className="mt-1 block text-xs text-slate-500">
+                  {p.priceCents > 0
+                    ? `Soit ${(skiPriceForDays(p.priceCents, 1) / 100).toFixed(2)} € par jour : le client choisit de 1 à 14 jours et paie au prorata.`
+                    : "Le client choisit de 1 à 14 jours et paie au prorata (tarif 6 jours ÷ 6 × nombre de jours)."}
+                </span>
+              </label>
+              <label className="block text-sm">
+                <span className="font-semibold text-ardoise">Pack pour *</span>
+                <select
+                  name="skier"
+                  defaultValue={p.skier ?? "adulte"}
+                  className={input}
+                >
+                  <option value="adulte">Adulte</option>
+                  <option value="enfant">Enfant</option>
+                </select>
+              </label>
+            </fieldset>
+          </>
+        ) : (
+          <>
+            <fieldset className="grid gap-4 sm:grid-cols-2">
+              <label className="block text-sm">
+                <span className="font-semibold text-ardoise">
+                  Prix TTC (€) *
+                </span>
+                <input
+                  name="price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  required
+                  defaultValue={(p.priceCents / 100).toFixed(2)}
+                  className={input}
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="font-semibold text-ardoise">
+                  Supplément par jour dès le 8e jour (€)
+                </span>
+                <input
+                  name="extraDay"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  defaultValue={((p.extraDayCents ?? 0) / 100).toFixed(2)}
+                  className={input}
+                />
+                <span className="mt-1 block text-xs text-slate-500">
+                  Le prix ci-dessus couvre 7 jours. 0 = pas de supplément.
+                </span>
+              </label>
+              <label className="block text-sm">
+                <span className="font-semibold text-ardoise">Catégorie *</span>
+                <select
+                  name="category"
+                  defaultValue={p.category}
+                  className={input}
+                >
+                  {Object.entries(CATEGORY_LABEL)
+                    .filter(([value]) => value !== "ski")
+                    .map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <label className="block text-sm">
+                <span className="font-semibold text-ardoise">
+                  Texte « tarif en attente »
+                </span>
+                <input
+                  name="pricePending"
+                  defaultValue={p.pricePending ?? ""}
+                  placeholder="Ex. : Tarif à confirmer"
+                  className={input}
+                />
+                <span className="mt-1 block text-xs text-slate-500">
+                  Si renseigné, la prestation est affichée mais ne peut pas être
+                  commandée.
+                </span>
+              </label>
+            </fieldset>
+          </>
+        )}
 
         <label className="flex items-center gap-2 text-sm">
           <input
@@ -248,7 +275,11 @@ export default async function AdminProductEditPage({
         </label>
 
         <button className="rounded-full bg-sapin px-6 py-3 font-semibold text-white hover:bg-sapin/90">
-          {isNew ? "Créer la prestation" : "Enregistrer"}
+          {isNew
+            ? isSki
+              ? "Créer le pack ski"
+              : "Créer la prestation"
+            : "Enregistrer"}
         </button>
       </form>
 
@@ -256,7 +287,7 @@ export default async function AdminProductEditPage({
         <form action={deleteProduct} className="mt-4">
           <input type="hidden" name="code" value={found.code} />
           <button className="text-sm text-red-700 hover:underline">
-            Supprimer cette prestation du site
+            Supprimer {isSki ? "ce pack" : "cette prestation"} du site
           </button>
         </form>
       )}
