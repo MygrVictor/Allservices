@@ -6,6 +6,8 @@ export const residenceSchema = z.enum(["arc_1800", "arc_2000"]);
 export const bookingItemSchema = z.object({
   productCode: z.string().min(1),
   quantity: z.number().int().min(1),
+  /** Location de ski : nombre de jours (indépendant de la durée du séjour). */
+  rentalDays: z.number().int().min(1).max(14).optional(),
 });
 
 export const checkoutPayloadSchema = z

@@ -5,14 +5,15 @@ import {
   CatalogProduct,
   formatEuros,
   stayDays,
-  unitPriceForStay,
+  unitPriceForItem,
 } from "@/lib/catalog";
+import { SkiDaysStepper } from "@/components/ski-days-stepper";
 import { useCart } from "@/components/cart-provider";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { makeT } from "@/lib/i18n";
 
-type CartItem = CatalogProduct & { quantity: number };
+type CartItem = CatalogProduct & { quantity: number; rentalDays?: number };
 
 export function CartDrawer({
   items,
@@ -31,8 +32,9 @@ export function CartDrawer({
   const count = items.reduce((sum, item) => sum + item.quantity, 0);
   const { dateArrivee, dateDepart } = useCart();
   const days = stayDays(dateArrivee, dateDepart);
+  const hasLinen = items.some((item) => item.category !== "ski");
   const total = items.reduce(
-    (sum, item) => sum + unitPriceForStay(item, days) * item.quantity,
+    (sum, item) => sum + unitPriceForItem(item, days) * item.quantity,
     0,
   );
 
@@ -131,11 +133,16 @@ export function CartDrawer({
                     </p>
                     <p className="text-xs text-slate-600">
                       {formatEuros(
-                        unitPriceForStay(item, days) * item.quantity,
+                        unitPriceForItem(item, days) * item.quantity,
                         locale,
                       )}
-                      {days > 0 && <span className="ml-1">· {days} j</span>}
+                      {item.category !== "ski" && days > 0 && (
+                        <span className="ml-1">· {days} j</span>
+                      )}
                     </p>
+                    {item.category === "ski" && (
+                      <SkiDaysStepper code={item.code} className="mt-1" />
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <button
@@ -174,7 +181,7 @@ export function CartDrawer({
               {formatEuros(total, locale)}
             </span>
           </div>
-          {days > 0 && days < 7 && (
+          {hasLinen && days > 0 && days < 7 && (
             <p className="-mt-2 mb-4 text-xs text-slate-600">
               {t(
                 "Forfait minimum de 7 jours facturé",
@@ -182,17 +189,27 @@ export function CartDrawer({
               )}
             </p>
           )}
-          {days > 7 && (
+          {hasLinen && days > 7 && (
             <p className="-mt-2 mb-4 text-xs text-slate-600">
               {t(`${days - 7} jours supplémentaires`, `${days - 7} extra days`)}
             </p>
           )}
-          <p className="-mt-2 mb-4 text-xs text-slate-600">
-            {t(
-              "Forfait minimum de 7 jours, même pour un séjour plus court. Au-delà, un supplément par jour s'applique dès le 8e jour sur certains articles (calculé à la commande selon vos dates).",
-              "7-day minimum rental. Beyond that, some items have a per-day supplement from day 8.",
-            )}
-          </p>
+          {items.some((item) => item.category === "ski") && (
+            <p className="-mt-2 mb-4 text-xs text-slate-600">
+              {t(
+                "Location de ski : tarif 6 jours divisé par 6, facturé au nombre de jours choisi (indépendant de la durée de location du linge).",
+                "Ski rental: 6-day rate divided by 6, billed for the number of days you choose (independent of the linen rental period).",
+              )}
+            </p>
+          )}
+          {hasLinen && (
+            <p className="-mt-2 mb-4 text-xs text-slate-600">
+              {t(
+                "Forfait minimum de 7 jours, même pour un séjour plus court. Au-delà, un supplément par jour s'applique dès le 8e jour sur certains articles (calculé à la commande selon vos dates).",
+                "7-day minimum rental. Beyond that, some items have a per-day supplement from day 8.",
+              )}
+            </p>
+          )}
           <a
             href={checkoutHref}
             onClick={() => setOpen(false)}

@@ -180,3 +180,42 @@ describe("supplément journalier dès le 8e jour", () => {
     );
   });
 });
+
+describe("location de ski : durée indépendante du séjour", () => {
+  const pack: CatalogProduct = {
+    ...PRODUCTS.find((p) => p.code === "ski-pack-adulte")!,
+    priceCents: 11270,
+    pricePending: undefined,
+  };
+  const order = (rentalDays: number | undefined, dateDepart: string) =>
+    buildOrderLines(
+      {
+        ...base,
+        dateArrivee: "2026-12-01",
+        dateDepart,
+        items: [{ productCode: pack.code, quantity: 1, rentalDays }],
+      },
+      [pack],
+    );
+
+  it("prorate le tarif 6 jours au jour (tarif ÷ 6 × jours)", () => {
+    vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
+    expect(order(6, "2026-12-08")!.totalCents).toBe(11270);
+    expect(order(3, "2026-12-08")!.totalCents).toBe(5635);
+    expect(order(1, "2026-12-08")!.totalCents).toBe(1878);
+  });
+
+  it("ne dépend pas de la durée du séjour linge", () => {
+    vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
+    // séjour de 14 jours, ski 3 jours : pas de supplément
+    expect(order(3, "2026-12-15")!.totalCents).toBe(5635);
+    expect(order(3, "2026-12-15")!.lines[0].rentalDays).toBe(3);
+  });
+
+  it("borne la durée (1 à 14 jours) et applique 6 jours par défaut", () => {
+    vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
+    expect(order(undefined, "2026-12-08")!.totalCents).toBe(11270);
+    expect(order(99, "2026-12-08")!.lines[0].rentalDays).toBe(14);
+    expect(order(0, "2026-12-08")!.lines[0].rentalDays).toBe(1);
+  });
+});

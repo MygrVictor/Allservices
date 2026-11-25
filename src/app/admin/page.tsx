@@ -21,7 +21,7 @@ import {
   subYears,
 } from "date-fns";
 import { fr } from "date-fns/locale";
-import { formatEuros } from "@/lib/catalog";
+import { formatEuros, withRentalDays } from "@/lib/catalog";
 import { prisma } from "@/lib/prisma";
 import { residenceLabel } from "@/lib/admin";
 
@@ -396,7 +396,10 @@ export default async function AdminOrdersPage({
                 </td>
                 <td className="px-4 py-3 text-slate-700">
                   {b.items
-                    .map((i) => `${i.product.name} ×${i.quantity}`)
+                    .map(
+                      (i) =>
+                        `${withRentalDays(i.product.name, i.rentalDays)} ×${i.quantity}`,
+                    )
                     .join(", ")}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-right font-semibold">

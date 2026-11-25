@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BookingStatus, Residence, TargetAudience } from "@prisma/client";
+import { withRentalDays } from "@/lib/catalog";
 import { buildOrderLines } from "@/lib/checkout";
 import { getPaymentProvider } from "@/lib/payment";
 import { appOrigin } from "@/lib/orders";
@@ -81,11 +82,14 @@ export async function POST(request: NextRequest) {
         notes: payload.notes,
         paymentProvider: provider.id,
         items: {
-          create: lines.map(({ product, quantity, unitPriceCents }) => ({
-            quantity,
-            unitPriceCents,
-            product: { connect: { code: product.code } },
-          })),
+          create: lines.map(
+            ({ product, quantity, unitPriceCents, rentalDays }) => ({
+              quantity,
+              unitPriceCents,
+              rentalDays,
+              product: { connect: { code: product.code } },
+            }),
+          ),
         },
       },
     });
@@ -99,8 +103,8 @@ export async function POST(request: NextRequest) {
       customerFirstName: firstName,
       customerLastName: rest.join(" "),
       totalCents: total,
-      items: lines.map(({ product, quantity, unitPriceCents }) => ({
-        name: product.name,
+      items: lines.map(({ product, quantity, unitPriceCents, rentalDays }) => ({
+        name: withRentalDays(product.name, rentalDays),
         description: product.description,
         unitAmountCents: unitPriceCents,
         quantity,

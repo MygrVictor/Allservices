@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { formatEuros } from "@/lib/catalog";
+import { formatEuros, withRentalDays } from "@/lib/catalog";
 import { prisma } from "@/lib/prisma";
 import { residenceLabel } from "@/lib/admin";
 import { orderPdfKinds } from "@/lib/orders";
@@ -102,7 +102,9 @@ export default async function AdminOrderPage({
               <tbody>
                 {b.items.map((i) => (
                   <tr key={i.id} className="border-t border-slate-100">
-                    <td className="py-2 pr-2">{i.product.name}</td>
+                    <td className="py-2 pr-2">
+                      {withRentalDays(i.product.name, i.rentalDays)}
+                    </td>
                     <td className="py-2 pr-2 text-right">×{i.quantity}</td>
                     <td className="py-2 text-right whitespace-nowrap">
                       {formatEuros(i.unitPriceCents * i.quantity)}

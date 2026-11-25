@@ -106,6 +106,8 @@ model BookingItem {
   productId    String
   quantity     Int
   unitPriceCents Int
+  /// Location de ski : nombre de jours (null pour le linge et les autres prestations)
+  rentalDays   Int?
 
   booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id], onDelete: Restrict)

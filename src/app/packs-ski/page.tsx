@@ -2,13 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { PageContainer } from "@/components/page-container";
 import { SiteCart } from "@/components/site-cart";
+import { SkiPackPricing } from "@/components/ski-days-stepper";
 import { AddToCartButton } from "@/components/add-to-cart-button";
-import {
-  formatEuros,
-  isOrderable,
-  localizeProduct,
-  skiPacks,
-} from "@/lib/catalog";
+import { isOrderable, localizeProduct, skiPacks } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 import { getLocale } from "@/lib/i18n-server";
 import { makeT } from "@/lib/i18n";
@@ -152,23 +148,24 @@ export default async function PacksSkiPage() {
                     {pack.description}
                   </p>
 
-                  <div className="flex items-center justify-between border-t border-accent/20 pt-4">
-                    <div className="text-2xl font-bold">
-                      {isOrderable(pack) ? (
-                        <span className="text-accent">
-                          {formatEuros(pack.priceCents, locale)}
-                        </span>
-                      ) : (
-                        <span className="text-sm font-semibold text-slate-600">
-                          {t("Pas disponible", "Not available")}
-                        </span>
-                      )}
+                  <div className="border-t border-accent/20 pt-4">
+                    {isOrderable(pack) ? (
+                      <SkiPackPricing
+                        code={pack.code}
+                        priceCents={pack.priceCents}
+                      />
+                    ) : (
+                      <p className="text-sm font-semibold text-slate-600">
+                        {t("Pas disponible", "Not available")}
+                      </p>
+                    )}
+                    <div className="mt-3 flex justify-end">
+                      <AddToCartButton
+                        code={pack.code}
+                        label={pack.name}
+                        disabled={!isOrderable(pack)}
+                      />
                     </div>
-                    <AddToCartButton
-                      code={pack.code}
-                      label={pack.name}
-                      disabled={!isOrderable(pack)}
-                    />
                   </div>
                 </article>
               );
@@ -185,8 +182,8 @@ export default async function PacksSkiPage() {
                   icon: "⛷",
                   title: t("Choisissez", "Choose"),
                   text: t(
-                    "Vos packs adulte / enfant.",
-                    "Your adult / child packs.",
+                    "Vos packs et le nombre de jours de ski (de 1 à 14).",
+                    "Your packs and number of ski days (1 to 14).",
                   ),
                 },
                 {

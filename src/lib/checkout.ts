@@ -2,8 +2,9 @@ import {
   DELIVERY_PRODUCT_CODE,
   PRODUCTS,
   isOrderable,
+  clampSkiDays,
   stayDays,
-  unitPriceForStay,
+  unitPriceForItem,
   type CatalogProduct,
 } from "@/lib/catalog";
 import type { CheckoutPayload } from "@/lib/validation";
@@ -11,6 +12,8 @@ import type { CheckoutPayload } from "@/lib/validation";
 export type CartLine = {
   product: CatalogProduct;
   quantity: number;
+  /** Jours de location de ski (lignes ski uniquement). */
+  rentalDays?: number;
   /** Prix unitaire pour la durée du séjour (supplément jours inclus). */
   unitPriceCents: number;
 };
@@ -40,10 +43,13 @@ export function buildOrderLines(
     ) {
       return null;
     }
+    const rentalDays =
+      product.category === "ski" ? clampSkiDays(item.rentalDays) : undefined;
     lines.push({
       product,
       quantity: item.quantity,
-      unitPriceCents: unitPriceForStay(product, days),
+      rentalDays,
+      unitPriceCents: unitPriceForItem({ ...product, rentalDays }, days),
     });
   }
 

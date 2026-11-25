@@ -11,7 +11,7 @@ import {
   INCLUDED_RENTAL_DAYS,
   formatEuros,
   stayDays,
-  unitPriceForStay,
+  unitPriceForItem,
 } from "@/lib/catalog";
 import { SITE } from "@/lib/site-config";
 
@@ -22,8 +22,9 @@ export default function CommandePage() {
     useCart();
   const count = items.reduce((s, i) => s + i.quantity, 0);
   const days = stayDays(dateArrivee, dateDepart);
+  const hasLinen = items.some((i) => i.category !== "ski");
   const total = items.reduce(
-    (s, i) => s + unitPriceForStay(i, days) * i.quantity,
+    (s, i) => s + unitPriceForItem(i, days) * i.quantity,
     0,
   );
 
@@ -200,10 +201,13 @@ export default function CommandePage() {
                             {item.quantity}×
                           </span>
                           {item.name}
+                          {item.rentalDays
+                            ? ` · ${item.rentalDays} ${t(item.rentalDays > 1 ? "jours" : "jour", item.rentalDays > 1 ? "days" : "day")}`
+                            : ""}
                         </span>
                         <span className="shrink-0 font-semibold text-ardoise">
                           {formatEuros(
-                            unitPriceForStay(item, days) * item.quantity,
+                            unitPriceForItem(item, days) * item.quantity,
                             locale,
                           )}
                         </span>
@@ -216,7 +220,7 @@ export default function CommandePage() {
                       {formatEuros(total, locale)}
                     </span>
                   </div>
-                  {days > 0 && days < INCLUDED_RENTAL_DAYS && (
+                  {hasLinen && days > 0 && days < INCLUDED_RENTAL_DAYS && (
                     <p className="px-5 pb-2 text-xs text-slate-600">
                       {t(
                         "Forfait minimum de 7 jours facturé",
@@ -224,7 +228,7 @@ export default function CommandePage() {
                       )}
                     </p>
                   )}
-                  {days > INCLUDED_RENTAL_DAYS && (
+                  {hasLinen && days > INCLUDED_RENTAL_DAYS && (
                     <p className="px-5 pb-2 text-xs text-slate-600">
                       {t(
                         `${days - INCLUDED_RENTAL_DAYS} jours supplémentaires`,

@@ -62,6 +62,46 @@ export function unitPriceForStay(
   return product.priceCents + (product.extraDayCents ?? 0) * extraDays;
 }
 
+/** Location de ski : le prix du pack est un tarif 6 jours, proratisé au jour. */
+export const SKI_PRICE_DAYS = 6;
+export const SKI_DEFAULT_DAYS = 6;
+export const SKI_MIN_DAYS = 1;
+export const SKI_MAX_DAYS = 14;
+
+/** Durée de location de ski valide (entier entre SKI_MIN_DAYS et SKI_MAX_DAYS). */
+export function clampSkiDays(days?: number): number {
+  const n = Math.round(Number(days ?? SKI_DEFAULT_DAYS));
+  if (!Number.isFinite(n)) return SKI_DEFAULT_DAYS;
+  return Math.min(SKI_MAX_DAYS, Math.max(SKI_MIN_DAYS, n));
+}
+
+/** Prix d'un pack ski pour N jours = tarif 6 jours ÷ 6 × N (au centime). */
+export function skiPriceForDays(priceCents: number, days?: number): number {
+  return Math.round((priceCents * clampSkiDays(days)) / SKI_PRICE_DAYS);
+}
+
+/**
+ * Prix unitaire d'une ligne de commande. Le ski dépend de SA durée de
+ * location (rentalDays), indépendante de la durée du séjour / du linge.
+ */
+export function unitPriceForItem(
+  item: Pick<CatalogProduct, "priceCents" | "extraDayCents" | "category"> & {
+    rentalDays?: number;
+  },
+  stayDaysCount: number,
+): number {
+  return item.category === "ski"
+    ? skiPriceForDays(item.priceCents, item.rentalDays)
+    : unitPriceForStay(item, stayDaysCount);
+}
+
+/** Nom affiché d'une ligne avec sa durée de location de ski (« … — 3 jours »). */
+export function withRentalDays(name: string, rentalDays?: number | null) {
+  return rentalDays
+    ? `${name} — ${rentalDays} jour${rentalDays > 1 ? "s" : ""}`
+    : name;
+}
+
 export const PRODUCTS: CatalogProduct[] = [
   {
     code: "accueil-clefs-illimite",

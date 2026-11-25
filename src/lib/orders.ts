@@ -1,4 +1,5 @@
 import { BookingStatus } from "@prisma/client";
+import { withRentalDays } from "@/lib/catalog";
 import { sendBookingEmails } from "@/lib/email";
 import { generateOrderPdf } from "@/lib/order-pdf";
 import { prisma } from "@/lib/prisma";
@@ -77,7 +78,7 @@ export async function buildOrderPdf(
     totalCents,
     items: items.map((item) => ({
       code: item.product.code,
-      name: item.product.name,
+      name: withRentalDays(item.product.name, item.rentalDays),
       quantity: item.quantity,
       unitPriceCents: item.unitPriceCents,
     })),
@@ -137,7 +138,7 @@ export async function confirmOrderPayment(params: {
     creneauLivraison: booking.creneauLivraison,
     totalCents: booking.montantTotalCents,
     items: booking.items.map((item) => ({
-      name: item.product.name,
+      name: withRentalDays(item.product.name, item.rentalDays),
       quantity: item.quantity,
       unitPriceCents: item.unitPriceCents,
     })),

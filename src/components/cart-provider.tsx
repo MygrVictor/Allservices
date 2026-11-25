@@ -10,6 +10,8 @@ import {
   type ReactNode,
 } from "react";
 import {
+  SKI_DEFAULT_DAYS,
+  clampSkiDays,
   localizeProduct,
   productsForAudience,
   type CatalogProduct,
@@ -17,13 +19,17 @@ import {
 import { useLocale } from "@/components/locale-provider";
 
 const STORAGE_KEY = "asm-cart";
+const SKI_DAYS_KEY = "asm-ski-days";
 
 type CartContextValue = {
   quantities: Record<string, number>;
   setQuantities: (next: Record<string, number>) => void;
   add: (code: string) => void;
   remove: (code: string) => void;
-  items: (CatalogProduct & { quantity: number })[];
+  /** Jours de location de ski par pack (indépendant du séjour linge). */
+  skiDays: Record<string, number>;
+  setSkiDays: (code: string, days: number) => void;
+  items: (CatalogProduct & { quantity: number; rentalDays?: number })[];
   dateArrivee: string;
   dateDepart: string;
   setDates: (dateArrivee: string, dateDepart: string) => void;
@@ -35,6 +41,7 @@ const CartContext = createContext<CartContextValue | null>(null);
 export function CartProvider({ children }: { children: ReactNode }) {
   const locale = useLocale();
   const [quantities, setQuantitiesState] = useState<Record<string, number>>({});
+  const [skiDays, setSkiDaysState] = useState<Record<string, number>>({});
   const [dateArrivee, setDateArrivee] = useState("");
   const [dateDepart, setDateDepart] = useState("");
 
@@ -42,6 +49,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) setQuantitiesState(JSON.parse(saved));
+      const savedDays = localStorage.getItem(SKI_DAYS_KEY);
+      if (savedDays) setSkiDaysState(JSON.parse(savedDays));
     } catch {
       /* ignore */
     }
@@ -57,6 +66,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch {
       /* ignore */
     }
+  }, []);
+
+  const setSkiDays = useCallback((code: string, days: number) => {
+    setSkiDaysState((previous) => {
+      const next = { ...previous, [code]: clampSkiDays(days) };
+      try {
+        localStorage.setItem(SKI_DAYS_KEY, JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
   }, []);
 
   const add = useCallback(
@@ -77,8 +98,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
         .map((p) => ({
           ...localizeProduct(p, locale),
           quantity: quantities[p.code],
+          rentalDays:
+            p.category === "ski"
+              ? (skiDays[p.code] ?? SKI_DEFAULT_DAYS)
+              : undefined,
         })),
-    [quantities, locale],
+    [quantities, skiDays, locale],
   );
 
   const setDates = useCallback((arrival: string, departure: string) => {
@@ -93,6 +118,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setQuantities,
         add,
         remove,
+        skiDays,
+        setSkiDays,
         items,
         dateArrivee,
         dateDepart,

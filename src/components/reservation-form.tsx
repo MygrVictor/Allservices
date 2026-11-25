@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import {
+  SKI_DEFAULT_DAYS,
   AMBIGUOUS_PRODUCT,
   AMBIGUOUS_PRODUCT_EN,
   DELIVERY_PRODUCT_CODE,
@@ -14,7 +15,7 @@ import {
   productsForAudience,
   residenceOptions,
   stayDays,
-  unitPriceForStay,
+  unitPriceForItem,
   type CatalogProduct,
   type Residence,
 } from "@/lib/catalog";
@@ -23,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { makeT, type Translate } from "@/lib/i18n";
 import { useCart } from "@/components/cart-provider";
+import { SkiDaysStepper } from "@/components/ski-days-stepper";
 
 type PickupMode = "retrait" | "livraison";
 
@@ -92,6 +94,8 @@ export function ReservationForm({
   const steps = getSteps(t);
   const groups = getGroups(t);
   const eur = (cents: number) => formatEuros(cents, locale);
+  const skiDaysLabel = (n: number) =>
+    `${n} ${t(n > 1 ? "jours" : "jour", n > 1 ? "days" : "day")} ${t("de ski", "of skiing")}`;
   const fmtDate = (value: string) =>
     format(new Date(value), locale === "en" ? "d MMM yyyy" : "dd/MM/yyyy");
   const cartMode = Boolean(onCartChange);
@@ -105,7 +109,7 @@ export function ReservationForm({
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
-  const { setDates } = useCart();
+  const { setDates, skiDays } = useCart();
 
   useEffect(() => {
     setDates(data.dateArrivee, data.dateDepart);
@@ -139,9 +143,13 @@ export function ReservationForm({
         .map((product) => ({
           ...product,
           quantity: quantities[product.code] ?? 0,
+          rentalDays:
+            product.category === "ski"
+              ? (skiDays[product.code] ?? SKI_DEFAULT_DAYS)
+              : undefined,
         }))
         .filter((item) => item.quantity > 0),
-    [products, quantities],
+    [products, quantities, skiDays],
   );
 
   const deliveryCents =
@@ -149,9 +157,10 @@ export function ReservationForm({
       ? (deliveryProduct?.priceCents ?? 0)
       : 0;
   const days = stayDays(data.dateArrivee, data.dateDepart);
+  const hasLinen = selectedItems.some((item) => item.category !== "ski");
   const totalCents =
     selectedItems.reduce(
-      (sum, item) => sum + unitPriceForStay(item, days) * item.quantity,
+      (sum, item) => sum + unitPriceForItem(item, days) * item.quantity,
       0,
     ) + deliveryCents;
 
@@ -261,6 +270,7 @@ export function ReservationForm({
           items: selectedItems.map((item) => ({
             productCode: item.code,
             quantity: item.quantity,
+            rentalDays: item.rentalDays,
           })),
         }),
       });
@@ -414,9 +424,12 @@ export function ReservationForm({
                     <div className="min-w-0">
                       <p className="font-medium text-ardoise">{item.name}</p>
                       <p className="text-sm font-semibold text-primary">
-                        {eur(unitPriceForStay(item, days))} × {item.quantity} ={" "}
-                        {eur(unitPriceForStay(item, days) * item.quantity)}
+                        {eur(unitPriceForItem(item, days))} × {item.quantity} ={" "}
+                        {eur(unitPriceForItem(item, days) * item.quantity)}
                       </p>
+                      {item.category === "ski" ? (
+                        <SkiDaysStepper code={item.code} className="mt-1" />
+                      ) : null}
                       {item.extraDayCents && days > INCLUDED_RENTAL_DAYS ? (
                         <p className="text-xs text-slate-600">
                           {t(
@@ -820,9 +833,10 @@ export function ReservationForm({
               >
                 <span>
                   {item.name} ×{item.quantity}
+                  {item.rentalDays ? ` · ${skiDaysLabel(item.rentalDays)}` : ""}
                 </span>
                 <span className="font-medium">
-                  {eur(unitPriceForStay(item, days) * item.quantity)}
+                  {eur(unitPriceForItem(item, days) * item.quantity)}
                 </span>
               </li>
             ))}
@@ -862,11 +876,14 @@ export function ReservationForm({
 
             <ul className="mt-4 space-y-2 border-y border-slate-200 py-3 text-sm">
               {selectedItems.map((item) => {
-                const unit = unitPriceForStay(item, days);
+                const unit = unitPriceForItem(item, days);
                 return (
                   <li key={item.code} className="flex justify-between gap-3">
                     <span className="text-slate-700">
                       {item.name} ×{item.quantity}
+                      {item.rentalDays
+                        ? ` · ${skiDaysLabel(item.rentalDays)}`
+                        : ""}
                     </span>
                     <span className="font-semibold text-ardoise">
                       {eur(unit * item.quantity)}
@@ -894,7 +911,7 @@ export function ReservationForm({
             <div className="mt-4 flex items-end justify-between gap-3">
               <div>
                 <p className="text-sm text-slate-600">{t("Total", "Total")}</p>
-                {days > 0 && days < INCLUDED_RENTAL_DAYS && (
+                {hasLinen && days > 0 && days < INCLUDED_RENTAL_DAYS && (
                   <p className="mt-1 max-w-[150px] text-xs text-slate-600">
                     {t(
                       "Forfait minimum de 7 jours facturé",
@@ -902,7 +919,7 @@ export function ReservationForm({
                     )}
                   </p>
                 )}
-                {days > INCLUDED_RENTAL_DAYS && (
+                {hasLinen && days > INCLUDED_RENTAL_DAYS && (
                   <p className="mt-1 max-w-[150px] text-xs text-slate-600">
                     {t(
                       `${days - INCLUDED_RENTAL_DAYS} jour${days - INCLUDED_RENTAL_DAYS > 1 ? "s" : ""} supplémentaire${days - INCLUDED_RENTAL_DAYS > 1 ? "s" : ""}`,
