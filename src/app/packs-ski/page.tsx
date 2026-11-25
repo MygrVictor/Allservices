@@ -232,21 +232,6 @@ export default async function PacksSkiPage() {
                 </li>
               ))}
             </ol>
-            <div className="mt-5 flex flex-col items-start justify-between gap-3 rounded-[20px] border border-primary/10 bg-neige p-4 sm:flex-row sm:items-center">
-              <p className="text-sm font-medium text-ardoise">
-                {t(
-                  "Une question sur les packs ski ?",
-                  "A question about ski packs?",
-                )}
-              </p>
-              <Link
-                href="/contact?sujet=ski"
-                className="inline-flex items-center gap-2 rounded-full bg-sapin px-5 py-2 text-sm font-semibold text-white transition hover:bg-sapin/90"
-              >
-                {t("Contactez-nous", "Contact us")}
-                <span aria-hidden>→</span>
-              </Link>
-            </div>
           </div>
         </PageContainer>
       </section>
