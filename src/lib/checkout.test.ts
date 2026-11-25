@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { buildOrderLines } from "@/lib/checkout";
 import {
   DELIVERY_PRODUCT_CODE,
@@ -11,8 +11,6 @@ const base = {
   residence: "arc_1800" as const,
   modeRecuperation: "retrait" as const,
 };
-
-afterEach(() => vi.unstubAllEnvs());
 
 const prix = (code: string) =>
   PRODUCTS.find((p) => p.code === code)!.priceCents;
@@ -124,7 +122,6 @@ describe("buildOrderLines — calcul du total au paiement", () => {
   });
 
   it("accepte un pack ski aux deux stations, refuse un pack d'une autre station", () => {
-    vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
     const pack: CatalogProduct = {
       ...PRODUCTS.find((p) => p.code === "ski-pack-adulte")!,
       priceCents: 9900,
@@ -200,21 +197,18 @@ describe("location de ski : durée indépendante du séjour", () => {
     );
 
   it("prorate le tarif 6 jours au jour (tarif ÷ 6 × jours)", () => {
-    vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
     expect(order(6, "2026-12-08")!.totalCents).toBe(11270);
     expect(order(3, "2026-12-08")!.totalCents).toBe(5635);
     expect(order(1, "2026-12-08")!.totalCents).toBe(1878);
   });
 
   it("ne dépend pas de la durée du séjour linge", () => {
-    vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
     // séjour de 14 jours, ski 3 jours : pas de supplément
     expect(order(3, "2026-12-15")!.totalCents).toBe(5635);
     expect(order(3, "2026-12-15")!.lines[0].rentalDays).toBe(3);
   });
 
   it("borne la durée (1 à 14 jours) et applique 6 jours par défaut", () => {
-    vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
     expect(order(undefined, "2026-12-08")!.totalCents).toBe(11270);
     expect(order(99, "2026-12-08")!.lines[0].rentalDays).toBe(14);
     expect(order(0, "2026-12-08")!.lines[0].rentalDays).toBe(1);
@@ -240,14 +234,12 @@ describe("livraison : réservée au linge", () => {
     )!;
 
   it("n'ajoute pas de livraison à un panier 100 % ski", () => {
-    vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
     const res = order([ski.code]);
     expect(res.lines.map((l) => l.product.code)).toEqual([ski.code]);
     expect(res.totalCents).toBe(skiPriceForDays(11270, 6));
   });
 
   it("ajoute la livraison dès qu'il y a du linge, même avec du ski", () => {
-    vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
     const res = order([ski.code, linen.code]);
     expect(res.lines.map((l) => l.product.code)).toContain(
       DELIVERY_PRODUCT_CODE,
