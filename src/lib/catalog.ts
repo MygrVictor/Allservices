@@ -261,32 +261,41 @@ export const PRODUCTS: CatalogProduct[] = [
     active: true,
   },
   // --- Packs location de ski -------------------------------------------
-  // Un pack = un produit valable aux deux stations (retrait à Arc 1800 et
-  // Arc 2000, la station est choisie à la commande). Nom, description et
-  // photo sont modifiables depuis le back-office.
+  // Un pack = un produit valable aux deux stations (la station est choisie
+  // au paiement). Le prix est un tarif 6 jours, proratisé au jour.
+  // Nom, description, photo et prix sont modifiables depuis le back-office.
   {
     code: "ski-pack-adulte",
-    name: "Pack location de ski adulte",
+    name: "Pack ski ou snow adulte — Découverte",
     description:
-      "Skis + chaussures + bâtons pour la durée du séjour. Bon à présenter en magasin.",
-    priceCents: 0,
+      "Pack Découverte : skis (ou snowboard) + chaussures + bâtons. Matériel sécurisant et maniable pour découvrir les plaisirs de la glisse facile. Tarif 6 jours.",
+    priceCents: 11270,
     targetAudience: "vacancier",
     category: "ski",
     active: true,
     skier: "adulte",
-    pricePending: "TARIF À CONFIRMER",
   },
   {
     code: "ski-pack-enfant",
-    name: "Pack location de ski enfant",
+    name: "Pack ski enfant 6 à 11 ans — Espoir",
     description:
-      "Skis + chaussures + bâtons (+ casque CONTENU À CONFIRMER). Bon à présenter en magasin.",
-    priceCents: 0,
+      "Pack Espoir (6 à 11 ans) : skis + chaussures + bâtons, de la découverte à la 2ème étoile. Tarif 6 jours.",
+    priceCents: 5445,
     targetAudience: "vacancier",
     category: "ski",
     active: true,
     skier: "enfant",
-    pricePending: "TARIF À CONFIRMER",
+  },
+  {
+    code: "ski-pack-mini",
+    name: "Pack ski enfant 3 à 5 ans — Mini Kid",
+    description:
+      "Pack Mini Kid (3 à 5 ans) : skis adaptés aux premiers virages + chaussures + bâtons. Tarif 6 jours.",
+    priceCents: 3750,
+    targetAudience: "vacancier",
+    category: "ski",
+    active: true,
+    skier: "enfant",
   },
 ];
 
@@ -414,16 +423,19 @@ const PRODUCTS_EN: Record<
       "Delivered to your accommodation on arrival day, between 5pm and 7pm. Time slot scheduled by our team.",
   },
   "ski-pack-adulte": {
-    name: "Adult ski rental pack",
+    name: "Adult ski or snowboard pack — Discovery",
     description:
-      "Skis + boots + poles for your stay. Voucher to present at the shop.",
-    pricePending: "PRICE TO BE CONFIRMED",
+      "Discovery pack: skis (or snowboard) + boots + poles. Safe, easy-to-handle equipment to discover the joys of easy gliding. 6-day rate.",
   },
   "ski-pack-enfant": {
-    name: "Child ski rental pack",
+    name: "Child ski pack 6 to 11 — Espoir",
     description:
-      "Skis + boots + poles (+ helmet TO BE CONFIRMED). Voucher to present at the shop.",
-    pricePending: "PRICE TO BE CONFIRMED",
+      "Espoir pack (6 to 11): skis + boots + poles, from first turns to the 2nd star. 6-day rate.",
+  },
+  "ski-pack-mini": {
+    name: "Child ski pack 3 to 5 — Mini Kid",
+    description:
+      "Mini Kid pack (3 to 5): skis suited to first turns + boots + poles. 6-day rate.",
   },
 };
 
