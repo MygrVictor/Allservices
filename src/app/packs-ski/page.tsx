@@ -9,7 +9,6 @@ import {
   localizeProduct,
   skiPacks,
 } from "@/lib/catalog";
-import { STATIONS } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 import { getLocale } from "@/lib/i18n-server";
 import { makeT } from "@/lib/i18n";
@@ -35,7 +34,21 @@ export default async function PacksSkiPage() {
   await loadSettings();
   const locale = getLocale();
   const t = makeT(locale);
-  const allPacks = skiPacks().map((p) => localizeProduct(p, locale));
+  // Mêmes packs et mêmes tarifs aux deux stations : une seule carte par
+  // type de pack. La station est choisie au moment de finaliser la commande.
+  const seenSkiers = new Set<string>();
+  const allPacks = skiPacks()
+    .filter((p) => {
+      const key = p.skier ?? p.code;
+      if (seenSkiers.has(key)) return false;
+      seenSkiers.add(key);
+      return true;
+    })
+    .map((p) => localizeProduct(p, locale));
+  const packTitle = (skier?: string) =>
+    skier === "enfant"
+      ? t("Pack Enfant", "Child pack")
+      : t("Pack Adulte", "Adult pack");
 
   return (
     <>
@@ -69,8 +82,8 @@ export default async function PacksSkiPage() {
               </h1>
               <p className="mt-5 max-w-2xl text-lg text-white/85">
                 {t(
-                  "Réservez votre matériel de ski adulte et enfant à Arc 1800 ou Arc 2000. Ajoutez vos packs au panier et finalisez votre commande avec votre linge.",
-                  "Book adult and child ski equipment in Arc 1800 or Arc 2000. Add your packs to the basket and complete your order together with your linen.",
+                  "Réservez votre matériel de ski adulte et enfant retirable à Arc 1800 et Arc 2000. Ajoutez vos packs au panier et finalisez votre commande avec votre linge.",
+                  "Book adult and child ski equipment available for pick-up in Arc 1800 and Arc 2000. Add your packs to the basket and complete your order together with your linen.",
                 )}
               </p>
               <Link
@@ -87,20 +100,15 @@ export default async function PacksSkiPage() {
       <section id="packs" className="scroll-mt-20 py-12">
         <PageContainer>
           <SiteCart />
-          <div className="mb-8 flex flex-wrap gap-3">
-            {STATIONS.map((station) => (
-              <button
-                key={station.id}
-                className="rounded-full border-2 border-accent/50 bg-gradient-to-br from-accent/10 to-accent/5 px-5 py-2 text-sm font-semibold text-ardoise transition-all hover:border-accent hover:bg-accent/15 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
-              >
-                {station.name}
-              </button>
-            ))}
-          </div>
+          <p className="mb-8 rounded-[20px] border border-accent/40 bg-accent/10 px-5 py-3 text-sm font-semibold text-ardoise">
+            {t(
+              "Matériel retirable à Arc 1800 et à Arc 2000.",
+              "Equipment can be picked up in Arc 1800 and Arc 2000.",
+            )}
+          </p>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {allPacks.map((pack) => {
-              const station = STATIONS.find((s) => s.id === pack.residence);
               return (
                 <article
                   key={pack.code}
@@ -113,17 +121,10 @@ export default async function PacksSkiPage() {
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div>
                       <h3 className="text-lg font-bold text-ardoise">
-                        {pack.skier === "enfant"
-                          ? t("Pack Enfant", "Child pack")
-                          : t("Pack Adulte", "Adult pack")}
+                        {packTitle(pack.skier)}
                       </h3>
-                      {station && (
-                        <p className="text-sm text-slate-600 mt-1">
-                          {station.name}
-                        </p>
-                      )}
                     </div>
-                    {pack.residence === "arc_1800" && (
+                    {pack.category === "ski" && (
                       <Image
                         src="/partners/skiset.png"
                         alt={t("Magasins Skiset", "Skiset shops")}
@@ -152,7 +153,7 @@ export default async function PacksSkiPage() {
                     </div>
                     <AddToCartButton
                       code={pack.code}
-                      label={pack.name}
+                      label={packTitle(pack.skier)}
                       disabled={!isOrderable(pack)}
                     />
                   </div>
@@ -171,8 +172,8 @@ export default async function PacksSkiPage() {
                   icon: "⛷",
                   title: t("Choisissez", "Choose"),
                   text: t(
-                    "Votre station et vos packs adulte / enfant.",
-                    "Your resort and your adult / child packs.",
+                    "Vos packs adulte / enfant.",
+                    "Your adult / child packs.",
                   ),
                 },
                 {
