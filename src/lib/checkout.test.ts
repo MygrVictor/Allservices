@@ -3,6 +3,7 @@ import { buildOrderLines } from "@/lib/checkout";
 import {
   DELIVERY_PRODUCT_CODE,
   PRODUCTS,
+  skiPriceForDays,
   type CatalogProduct,
 } from "@/lib/catalog";
 
@@ -217,5 +218,39 @@ describe("location de ski : durée indépendante du séjour", () => {
     expect(order(undefined, "2026-12-08")!.totalCents).toBe(11270);
     expect(order(99, "2026-12-08")!.lines[0].rentalDays).toBe(14);
     expect(order(0, "2026-12-08")!.lines[0].rentalDays).toBe(1);
+  });
+});
+
+describe("livraison : réservée au linge", () => {
+  const delivery = PRODUCTS.find((p) => p.code === DELIVERY_PRODUCT_CODE)!;
+  const ski: CatalogProduct = {
+    ...PRODUCTS.find((p) => p.code === "ski-pack-adulte")!,
+    priceCents: 11270,
+    pricePending: undefined,
+  };
+  const linen = PRODUCTS.find((p) => p.category === "linge")!;
+  const order = (codes: string[]) =>
+    buildOrderLines(
+      {
+        ...base,
+        modeRecuperation: "livraison",
+        items: codes.map((productCode) => ({ productCode, quantity: 1 })),
+      },
+      [delivery, ski, linen],
+    )!;
+
+  it("n'ajoute pas de livraison à un panier 100 % ski", () => {
+    vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
+    const res = order([ski.code]);
+    expect(res.lines.map((l) => l.product.code)).toEqual([ski.code]);
+    expect(res.totalCents).toBe(skiPriceForDays(11270, 6));
+  });
+
+  it("ajoute la livraison dès qu'il y a du linge, même avec du ski", () => {
+    vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
+    const res = order([ski.code, linen.code]);
+    expect(res.lines.map((l) => l.product.code)).toContain(
+      DELIVERY_PRODUCT_CODE,
+    );
   });
 });

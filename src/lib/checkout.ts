@@ -53,7 +53,11 @@ export function buildOrderLines(
     });
   }
 
-  if (payload.modeRecuperation === "livraison") {
+  // La livraison concerne le linge : pas de frais pour un panier 100 % ski.
+  if (
+    payload.modeRecuperation === "livraison" &&
+    lines.some((line) => line.product.category !== "ski")
+  ) {
     const delivery = catalogMap.get(DELIVERY_PRODUCT_CODE);
     if (delivery) {
       lines.push({

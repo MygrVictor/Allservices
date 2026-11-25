@@ -40,11 +40,14 @@ export async function POST(request: NextRequest) {
       );
     }
     const { lines, totalCents: total } = order;
+    // La livraison ne concerne que le linge (un panier 100 % ski se retire).
+    const delivers =
+      payload.modeRecuperation === "livraison" &&
+      lines.some((line) => line.product.category !== "ski");
 
-    const creneau =
-      payload.modeRecuperation === "livraison"
-        ? `Livraison entre ${SITE.deliveryWindow} (créneau planifié par All Services Montagne)`
-        : "Retrait en magasin pendant les heures d'ouverture";
+    const creneau = delivers
+      ? `Livraison entre ${SITE.deliveryWindow} (créneau planifié par All Services Montagne)`
+      : "Retrait en magasin pendant les heures d'ouverture";
 
     // Synchronise la fiche produit en base (nom/prix modifiés dans le back-office)
     for (const { product } of lines) {
@@ -67,10 +70,7 @@ export async function POST(request: NextRequest) {
       data: {
         targetAudience: TargetAudience.vacancier,
         residence: payload.residence as Residence,
-        propertyReference:
-          payload.modeRecuperation === "livraison"
-            ? payload.adresseLivraison
-            : undefined,
+        propertyReference: delivers ? payload.adresseLivraison : undefined,
         dateArrivee: new Date(payload.dateArrivee),
         dateDepart: new Date(payload.dateDepart),
         creneauLivraison: creneau,

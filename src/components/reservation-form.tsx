@@ -152,12 +152,12 @@ export function ReservationForm({
     [products, quantities, skiDays],
   );
 
-  const deliveryCents =
-    data.modeRecuperation === "livraison"
-      ? (deliveryProduct?.priceCents ?? 0)
-      : 0;
-  const days = stayDays(data.dateArrivee, data.dateDepart);
+  // La livraison ne concerne que le linge : un panier 100 % ski se retire.
   const hasLinen = selectedItems.some((item) => item.category !== "ski");
+  const mode = hasLinen ? data.modeRecuperation : "retrait";
+  const deliveryCents =
+    mode === "livraison" ? (deliveryProduct?.priceCents ?? 0) : 0;
+  const days = stayDays(data.dateArrivee, data.dateDepart);
   const totalCents =
     selectedItems.reduce(
       (sum, item) => sum + unitPriceForItem(item, days) * item.quantity,
@@ -196,10 +196,7 @@ export function ReservationForm({
       return false;
     }
     if (target === 2) {
-      if (
-        data.modeRecuperation === "livraison" &&
-        !data.adresseLivraison.trim()
-      ) {
+      if (mode === "livraison" && !data.adresseLivraison.trim()) {
         setError(
           t(
             "Indiquez l'adresse de livraison (résidence, n° d'appartement).",
@@ -258,11 +255,9 @@ export function ReservationForm({
           residence: data.residence,
           dateArrivee: data.dateArrivee,
           dateDepart: data.dateDepart,
-          modeRecuperation: data.modeRecuperation,
+          modeRecuperation: mode,
           adresseLivraison:
-            data.modeRecuperation === "livraison"
-              ? data.adresseLivraison
-              : undefined,
+            mode === "livraison" ? data.adresseLivraison : undefined,
           clientNom: data.clientNom,
           clientEmail: data.clientEmail,
           clientTelephone: data.clientTelephone,
@@ -602,127 +597,147 @@ export function ReservationForm({
 
       {step === 2 && (
         <div className="grid gap-4 sm:grid-cols-2">
-          <fieldset className="sm:col-span-2">
-            <legend className="mb-2 block text-sm font-medium text-slate-800">
-              {t("Récupération du linge", "Linen collection")}
-            </legend>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label
-                className={cn(
-                  "cursor-pointer rounded-panel border-2 p-3",
-                  data.modeRecuperation === "retrait"
-                    ? "border-primary bg-primary-light"
-                    : "border-slate-300",
-                )}
-              >
-                <input
-                  type="radio"
-                  name="modeRecuperation"
-                  className="mr-2"
-                  checked={data.modeRecuperation === "retrait"}
-                  onChange={() => update("modeRecuperation", "retrait")}
-                />
-                <span className="font-semibold text-ardoise">
-                  {t("Retrait en magasin", "In-store collection")}
-                </span>
-                <span className="block text-sm text-slate-700">
-                  {t("Gratuit", "Free")}
-                </span>
-              </label>
-              <label
-                className={cn(
-                  "cursor-pointer rounded-panel border-2 p-3",
-                  data.modeRecuperation === "livraison"
-                    ? "border-primary bg-primary-light"
-                    : "border-slate-300",
-                )}
-              >
-                <input
-                  type="radio"
-                  name="modeRecuperation"
-                  className="mr-2"
-                  checked={data.modeRecuperation === "livraison"}
-                  onChange={() => update("modeRecuperation", "livraison")}
-                />
-                <span className="font-semibold text-ardoise">
-                  {t(
-                    "Livraison à l'hébergement",
-                    "Delivery to your accommodation",
+          {hasLinen ? (
+            <fieldset className="sm:col-span-2">
+              <legend className="mb-2 block text-sm font-medium text-slate-800">
+                {t("Récupération du linge", "Linen collection")}
+              </legend>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label
+                  className={cn(
+                    "cursor-pointer rounded-panel border-2 p-3",
+                    data.modeRecuperation === "retrait"
+                      ? "border-primary bg-primary-light"
+                      : "border-slate-300",
                   )}
-                </span>
-                <span className="block text-sm text-slate-700">
-                  {deliveryProduct ? eur(deliveryProduct.priceCents) : ""}
-                </span>
-              </label>
-            </div>
-            <div
-              id="info-recuperation"
-              role="note"
-              className="mt-3 rounded-2xl border border-primary/30 bg-primary-light p-4 text-sm text-ardoise"
-            >
-              {data.modeRecuperation === "retrait" ? (
-                <>
-                  <p className="font-bold">
-                    🏪 {t("Retrait en agence", "Collection at our office")}
-                    {stationLabel ? ` · ${stationLabel}` : ""}
-                  </p>
-                  <p className="mt-1 text-slate-700">
+                >
+                  <input
+                    type="radio"
+                    name="modeRecuperation"
+                    className="mr-2"
+                    checked={data.modeRecuperation === "retrait"}
+                    onChange={() => update("modeRecuperation", "retrait")}
+                  />
+                  <span className="font-semibold text-ardoise">
+                    {t("Retrait en magasin", "In-store collection")}
+                  </span>
+                  <span className="block text-sm text-slate-700">
+                    {t("Gratuit", "Free")}
+                  </span>
+                </label>
+                <label
+                  className={cn(
+                    "cursor-pointer rounded-panel border-2 p-3",
+                    mode === "livraison"
+                      ? "border-primary bg-primary-light"
+                      : "border-slate-300",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="modeRecuperation"
+                    className="mr-2"
+                    checked={mode === "livraison"}
+                    onChange={() => update("modeRecuperation", "livraison")}
+                  />
+                  <span className="font-semibold text-ardoise">
                     {t(
-                      "Votre commande vous attend toute la journée, aux horaires d'ouverture.",
-                      "Your order is ready all day, during opening hours.",
+                      "Livraison à l'hébergement",
+                      "Delivery to your accommodation",
                     )}
-                  </p>
-                  <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl bg-sapin px-4 py-3 text-white">
-                    <span className="text-2xl" aria-hidden>
-                      ❄️
-                    </span>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-white/80">
-                        {t("Hiver · 7j/7", "Winter · 7 days a week")}
-                      </p>
-                      <p className="text-lg font-bold">
-                        {t(
-                          "9h – 12h  ·  15h – 19h",
-                          "9am – 12pm  ·  3pm – 7pm",
-                        )}
-                      </p>
+                  </span>
+                  <span className="block text-sm text-slate-700">
+                    {deliveryProduct ? eur(deliveryProduct.priceCents) : ""}
+                  </span>
+                </label>
+              </div>
+              <div
+                id="info-recuperation"
+                role="note"
+                className="mt-3 rounded-2xl border border-primary/30 bg-primary-light p-4 text-sm text-ardoise"
+              >
+                {data.modeRecuperation === "retrait" ? (
+                  <>
+                    <p className="font-bold">
+                      🏪 {t("Retrait en agence", "Collection at our office")}
+                      {stationLabel ? ` · ${stationLabel}` : ""}
+                    </p>
+                    <p className="mt-1 text-slate-700">
+                      {t(
+                        "Votre commande vous attend toute la journée, aux horaires d'ouverture.",
+                        "Your order is ready all day, during opening hours.",
+                      )}
+                    </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl bg-sapin px-4 py-3 text-white">
+                      <span className="text-2xl" aria-hidden>
+                        ❄️
+                      </span>
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-white/80">
+                          {t("Hiver · 7j/7", "Winter · 7 days a week")}
+                        </p>
+                        <p className="text-lg font-bold">
+                          {t(
+                            "9h – 12h  ·  15h – 19h",
+                            "9am – 12pm  ·  3pm – 7pm",
+                          )}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <p className="mt-2 text-xs text-slate-600">
-                    ☀️{" "}
+                    <p className="mt-2 text-xs text-slate-600">
+                      ☀️{" "}
+                      {t(
+                        "Été : du mardi au dimanche, 9h30 – 12h et 15h30 – 18h30 (fermé le lundi).",
+                        "Summer: Tuesday to Sunday, 9:30am – 12pm and 3:30pm – 6:30pm (closed Mondays).",
+                      )}
+                    </p>
+                    <p className="mt-3 flex items-center gap-2 font-semibold">
+                      📱{" "}
+                      {t(
+                        "Présentez votre bon de commande (papier ou sur téléphone).",
+                        "Show your order form (printed or on your phone).",
+                      )}
+                    </p>
+                    <p className="mt-2 text-sm font-semibold text-ardoise">
+                      💳{" "}
+                      {t(
+                        "Une empreinte de carte bancaire sera demandée comme caution du linge lors du retrait en agence.",
+                        "A card imprint will be requested as a linen deposit when collecting your order at our office.",
+                      )}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <strong>{t("Livraison :", "Delivery:")}</strong>{" "}
                     {t(
-                      "Été : du mardi au dimanche, 9h30 – 12h et 15h30 – 18h30 (fermé le lundi).",
-                      "Summer: Tuesday to Sunday, 9:30am – 12pm and 3:30pm – 6:30pm (closed Mondays).",
+                      `les livraisons ont lieu le jour de votre arrivée entre ${site.deliveryWindow}.`,
+                      `deliveries take place on your arrival day between ${site.deliveryWindow}. `,
                     )}
-                  </p>
-                  <p className="mt-3 flex items-center gap-2 font-semibold">
-                    📱{" "}
-                    {t(
-                      "Présentez votre bon de commande (papier ou sur téléphone).",
-                      "Show your order form (printed or on your phone).",
-                    )}
-                  </p>
-                  <p className="mt-2 text-sm font-semibold text-ardoise">
-                    💳{" "}
-                    {t(
-                      "Une empreinte de carte bancaire sera demandée comme caution du linge lors du retrait en agence.",
-                      "A card imprint will be requested as a linen deposit when collecting your order at our office.",
-                    )}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <strong>{t("Livraison :", "Delivery:")}</strong>{" "}
-                  {t(
-                    `les livraisons ont lieu le jour de votre arrivée entre ${site.deliveryWindow}.`,
-                    `deliveries take place on your arrival day between ${site.deliveryWindow}. `,
-                  )}
-                </>
-              )}
+                  </>
+                )}
+              </div>
+            </fieldset>
+          ) : (
+            <div
+              role="note"
+              className="rounded-2xl border border-primary/30 bg-primary-light p-4 text-sm text-ardoise sm:col-span-2"
+            >
+              <p className="font-bold">
+                {t(
+                  "Retrait du matériel de ski selon la station choisie",
+                  "Ski equipment pick-up at the resort you chose",
+                )}
+              </p>
+              <p className="mt-1">
+                {t(
+                  "Pas de livraison pour la location de ski : vous présentez votre bon en magasin.",
+                  "No delivery for ski rental: show your voucher at the shop.",
+                )}
+              </p>
             </div>
-          </fieldset>
+          )}
 
-          {data.modeRecuperation === "livraison" && (
+          {mode === "livraison" && (
             <label className="sm:col-span-2">
               <span className="mb-1 block text-sm font-medium text-slate-800">
                 {t(
@@ -806,7 +821,7 @@ export function ReservationForm({
               {data.dateDepart ? fmtDate(data.dateDepart) : "…"}
             </p>
             <p className="text-sm text-slate-700">
-              {data.modeRecuperation === "livraison"
+              {mode === "livraison"
                 ? t(
                     `Livraison entre ${site.deliveryWindow} — ${data.adresseLivraison}`,
                     `Delivery between ${site.deliveryWindow} — ${data.adresseLivraison}`,
@@ -816,7 +831,7 @@ export function ReservationForm({
                     "In-store collection during opening hours",
                   )}
             </p>
-            {data.modeRecuperation === "retrait" && (
+            {mode === "retrait" && hasLinen && (
               <p className="text-sm font-medium text-slate-700">
                 {t(
                   "Empreinte de carte demandée en agence pour la caution du linge.",
