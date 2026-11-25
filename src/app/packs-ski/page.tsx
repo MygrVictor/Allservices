@@ -4,6 +4,7 @@ import { SiteCart } from "@/components/site-cart";
 import { SkiPackPricing } from "@/components/ski-days-stepper";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { isOrderable, localizeProduct, skiPacks } from "@/lib/catalog";
+import { SITE } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 import { getLocale } from "@/lib/i18n-server";
 import { makeT } from "@/lib/i18n";
@@ -93,8 +94,8 @@ export default async function PacksSkiPage() {
               </p>
               <p className="mt-0.5 text-sm text-slate-700">
                 {t(
-                  "Le matériel sera à retirer en fonction de la station choisie au moment du paiement.",
-                  "Your equipment will be picked up according to the resort you choose at checkout.",
+                  `Le matériel sera à retirer en fonction de la station choisie au moment du paiement, et est récupérable à partir de ${SITE.skiPickupTime}.`,
+                  `Your equipment will be picked up according to the resort you choose at checkout, from ${SITE.skiPickupTime.replace("h", ":")} onwards.`,
                 )}
               </p>
             </div>

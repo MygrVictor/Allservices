@@ -8,6 +8,8 @@ export const SITE = {
   openingHours:
     "hiver 7j/7 9h–12h et 15h–19h ; été du mardi au dimanche 9h30–12h et 15h30–18h30, fermé le lundi",
   deliveryWindow: "17h – 19h",
+  /** Heure à partir de laquelle le matériel de ski peut être récupéré. */
+  skiPickupTime: "15h30",
   openingHoursEn:
     "winter 7 days a week 9am–12pm and 3pm–7pm; summer Tuesday to Sunday 9:30am–12pm and 3:30pm–6:30pm, closed Mondays",
   deliveryWindowEn: "5pm – 7pm",
@@ -26,6 +28,8 @@ export type Station = {
   directions: string;
   services: string[];
   badge?: string;
+  /** Magasin Skiset où retirer le matériel (sinon : « un magasin Skiset de la station »). */
+  skiShop?: string;
   /** Plan d'accès à l'agence. */
   photo: string;
   mapsUrl: string;
@@ -61,6 +65,7 @@ export const STATIONS: Station[] = [
       "Conciergerie : mêmes prestations qu'à Arc 1800",
       "Location de linge & équipement bébé",
     ],
+    skiShop: "Skiset Aiguille Rouge (place haute, Arc 2000)",
     badge: "Laverie automatique ouverte à l'année · 7j/7 · 24h/24",
     photo: "/stations/arc2000/plan.jpg",
     mapsUrl:

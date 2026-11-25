@@ -141,6 +141,7 @@ export async function confirmOrderPayment(params: {
       name: withRentalDays(item.product.name, item.rentalDays),
       quantity: item.quantity,
       unitPriceCents: item.unitPriceCents,
+      isSki: item.product.category === "ski",
     })),
     documents,
   });

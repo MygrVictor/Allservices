@@ -1,11 +1,14 @@
 import { Resend } from "resend";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { SITE, STATIONS } from "@/lib/site-config";
 
 type EmailBookingItem = {
   name: string;
   quantity: number;
   unitPriceCents: number;
+  /** Ligne de location de ski. */
+  isSki?: boolean;
 };
 
 type EmailPayload = {
@@ -69,10 +72,25 @@ export async function sendBookingEmails(payload: EmailPayload) {
         content: Buffer.from(d.pdf),
       }))
     : undefined;
+  const station = STATIONS.find((s) => s.id === payload.residence);
+  const stationName = station?.name ?? payload.residence ?? "votre station";
+  const skiShop = station?.skiShop
+    ? `au magasin ${station.skiShop}`
+    : `dans un magasin Skiset d'${stationName}`;
+  const skiItems = payload.items.filter((item) => item.isSki);
   const docLabel = (kind: "linge" | "ski") =>
     kind === "ski"
-      ? "Bon de retrait ski (valable dans n'importe quel magasin Skiset de votre station)"
+      ? `Bon de retrait ski (à présenter ${skiShop})`
       : "Bon de commande linge / conciergerie";
+  const fmtDay = (d: Date) => format(d, "EEEE d MMMM yyyy", { locale: fr });
+  const skiText = skiItems.length
+    ? `Retrait de votre matériel de ski :\n` +
+      skiItems.map((item) => `- ${item.name} x${item.quantity}`).join("\n") +
+      `\nOù : ${skiShop}\n` +
+      `Quand : à partir du ${fmtDay(payload.dateArrivee)} à ${SITE.skiPickupTime}\n` +
+      `Retour : au plus tard le ${fmtDay(payload.dateDepart)}\n` +
+      `Présentez votre bon (imprimé ou sur téléphone) avec une pièce d'identité.\n\n`
+    : "";
   const docsText = docs.length
     ? `Vos documents (en pièce jointe) :\n${docs
         .map((d) => `- ${docLabel(d.kind)}${d.url ? ` : ${d.url}` : ""}`)
@@ -89,8 +107,9 @@ export async function sendBookingEmails(payload: EmailPayload) {
         `Bonjour ${payload.clientNom},\n\n` +
         `Votre paiement est confirmé.\n\n` +
         docsText +
+        skiText +
         `Période : ${period}\n` +
-        `${payload.residence ? `Résidence : ${payload.residence}\n` : ""}` +
+        `${payload.residence ? `Station : ${stationName}\n` : ""}` +
         `${payload.propertyReference ? `Bien : ${payload.propertyReference}\n` : ""}` +
         `${payload.creneauLivraison ? `Créneau : ${payload.creneauLivraison}\n` : ""}` +
         `\nPrestations :\n${summary}\n\n` +
@@ -108,7 +127,7 @@ export async function sendBookingEmails(payload: EmailPayload) {
         `${payload.clientTelephone ? `Téléphone : ${payload.clientTelephone}\n` : ""}` +
         `Public : ${payload.audience}\n` +
         `Période : ${period}\n` +
-        `${payload.residence ? `Résidence : ${payload.residence}\n` : ""}` +
+        `${payload.residence ? `Station : ${stationName}\n` : ""}` +
         `${payload.propertyReference ? `Bien : ${payload.propertyReference}\n` : ""}` +
         `${payload.creneauLivraison ? `Créneau : ${payload.creneauLivraison}\n` : ""}` +
         `\nPrestations :\n${summary}\n\n` +

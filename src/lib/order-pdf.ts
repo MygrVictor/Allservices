@@ -392,11 +392,14 @@ export async function generateOrderPdf(
   if (hasSki) {
     y -= 6;
     const stationName = station?.name ?? "votre station";
+    const skiShop = station?.skiShop
+      ? `au magasin ${station.skiShop}`
+      : `dans un magasin Skiset d'${stationName}`;
     const skiLines = [
-      `Ce bon vous permet de retirer votre matériel de ski dans n'importe quel magasin Skiset d'${stationName}.`,
+      `Ce bon vous permet de retirer votre matériel de ski ${skiShop}.`,
       "Le matériel est déjà réglé : il vous suffit de présenter ce bon (imprimé ou sur votre téléphone) avec une pièce d'identité.",
       "Prévoyez la pointure et la taille / le poids de chaque skieur pour le réglage des fixations.",
-      `Le retrait se fait à partir du ${fmt(order.dateArrivee)}. Le matériel est à rendre dans un magasin Skiset d'${stationName} au plus tard le ${fmt(order.dateDepart)}.`,
+      `Le matériel est récupérable à partir du ${fmt(order.dateArrivee)} à ${SITE.skiPickupTime}. Il est à rendre ${skiShop} au plus tard le ${fmt(order.dateDepart)}.`,
     ].flatMap((s) => wrap(s, font, 9.5, width - 28));
     const skiH = 34 + skiLines.length * 13;
     ensureSpace(skiH + 10);
