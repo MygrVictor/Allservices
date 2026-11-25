@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "next/image";
 import { PageContainer } from "@/components/page-container";
 import { SiteCart } from "@/components/site-cart";
@@ -70,12 +69,6 @@ export default async function PacksSkiPage() {
                   "Book adult and child ski equipment. Add your packs to the basket and complete your order together with your linen: you choose your resort at checkout.",
                 )}
               </p>
-              <Link
-                href="#packs"
-                className="mt-7 inline-flex rounded-full bg-accent px-6 py-3 font-bold text-ardoise hover:bg-accent-dark transition-colors"
-              >
-                {t("Réserver mon pack ski", "Book my ski pack")}
-              </Link>
             </div>
           </div>
         </PageContainer>
