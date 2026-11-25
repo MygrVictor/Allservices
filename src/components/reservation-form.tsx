@@ -349,14 +349,19 @@ export function ReservationForm({
                     checked={data.residence === option.value}
                     onChange={() => {
                       update("residence", option.value);
-                      // les packs ski dépendent de la station
+                      // On ne retire que les produits propres à une autre
+                      // station (les packs ski valent pour les deux).
                       setQuantities(
                         Object.fromEntries(
-                          Object.entries(quantities).filter(
-                            ([code]) =>
-                              PRODUCTS.find((p) => p.code === code)
-                                ?.category !== "ski",
-                          ),
+                          Object.entries(quantities).filter(([code]) => {
+                            const product = PRODUCTS.find(
+                              (p) => p.code === code,
+                            );
+                            return (
+                              !product?.residence ||
+                              product.residence === option.value
+                            );
+                          }),
                         ),
                       );
                     }}
