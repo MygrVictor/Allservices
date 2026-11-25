@@ -87,7 +87,7 @@ export async function sendBookingEmails(payload: EmailPayload) {
     ? `Retrait de votre matériel de ski :\n` +
       skiItems.map((item) => `- ${item.name} x${item.quantity}`).join("\n") +
       `\nOù : ${skiShop}\n` +
-      `Quand : à partir du ${fmtDay(payload.dateArrivee)} à ${SITE.skiPickupTime}\n` +
+      `Quand : la veille de votre arrivée, le ${fmtDay(new Date(payload.dateArrivee.getTime() - 86_400_000))}, à partir de ${SITE.skiPickupTime}\n` +
       `Retour : au plus tard le ${fmtDay(payload.dateDepart)}\n` +
       `Présentez votre bon (imprimé ou sur téléphone) avec une pièce d'identité.\n\n`
     : "";

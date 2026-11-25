@@ -94,8 +94,8 @@ export default async function PacksSkiPage() {
               </p>
               <p className="mt-0.5 text-sm text-slate-700">
                 {t(
-                  `Le matériel sera à retirer en fonction de la station choisie au moment du paiement, et est récupérable à partir de ${SITE.skiPickupTime}.`,
-                  `Your equipment will be picked up according to the resort you choose at checkout, from ${SITE.skiPickupTime.replace("h", ":")} onwards.`,
+                  `Le matériel sera à retirer en fonction de la station choisie au moment du paiement, et est récupérable la veille de votre arrivée, à partir de ${SITE.skiPickupTime}.`,
+                  `Your equipment will be picked up according to the resort you choose at checkout, and can be collected the day before your arrival, from ${SITE.skiPickupTime.replace("h", ":")}.`,
                 )}
               </p>
             </div>

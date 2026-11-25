@@ -399,7 +399,7 @@ export async function generateOrderPdf(
       `Ce bon vous permet de retirer votre matériel de ski ${skiShop}.`,
       "Le matériel est déjà réglé : il vous suffit de présenter ce bon (imprimé ou sur votre téléphone) avec une pièce d'identité.",
       "Prévoyez la pointure et la taille / le poids de chaque skieur pour le réglage des fixations.",
-      `Le matériel est récupérable à partir du ${fmt(order.dateArrivee)} à ${SITE.skiPickupTime}. Il est à rendre ${skiShop} au plus tard le ${fmt(order.dateDepart)}.`,
+      `Le matériel est récupérable la veille de votre arrivée, le ${fmt(new Date(order.dateArrivee.getTime() - 86_400_000))}, à partir de ${SITE.skiPickupTime}. Il est à rendre ${skiShop} au plus tard le ${fmt(order.dateDepart)}.`,
     ].flatMap((s) => wrap(s, font, 9.5, width - 28));
     const skiH = 34 + skiLines.length * 13;
     ensureSpace(skiH + 10);
