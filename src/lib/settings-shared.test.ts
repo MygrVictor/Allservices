@@ -23,16 +23,23 @@ describe("Réglages du back-office", () => {
     expect(isOrderable(product("kit-draps-2p"))).toBe(false);
   });
 
-  it("applique un tarif modifié sur un pack ski, commandable par défaut", () => {
-    expect(isOrderable(product("ski-pack-adulte"))).toBe(true);
+  it("applique les packs ski créés dans le back-office", () => {
+    const pack = {
+      code: "ski-pack-test",
+      name: "Pack test",
+      description: "",
+      priceCents: 12900,
+      targetAudience: "vacancier" as const,
+      category: "ski" as const,
+      active: true,
+    };
+    expect(PRODUCTS.some((p) => p.category === "ski")).toBe(false);
+    applySettings({ catalog: [...PRODUCTS, pack] });
+    expect(isOrderable(product("ski-pack-test"))).toBe(true);
     applySettings({
-      prices: { "ski-pack-adulte": { priceCents: 12900, active: true } },
+      catalog: [...PRODUCTS.slice(0, -1), { ...pack, active: false }],
     });
-    expect(product("ski-pack-adulte").priceCents).toBe(12900);
-    applySettings({
-      prices: { "ski-pack-adulte": { priceCents: 12900, active: false } },
-    });
-    expect(isOrderable(product("ski-pack-adulte"))).toBe(false);
+    expect(isOrderable(product("ski-pack-test"))).toBe(false);
   });
 
   it("revient aux valeurs d'origine sans réglages", () => {
@@ -44,7 +51,6 @@ describe("Réglages du back-office", () => {
     expect(product("kit-draps-2p").priceCents).toBe(
       original.prices["kit-draps-2p"].priceCents,
     );
-    expect(product("ski-pack-adulte").priceCents).toBe(11270);
   });
 
   it("applique les horaires et ignore un champ vide", () => {

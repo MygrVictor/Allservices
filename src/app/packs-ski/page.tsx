@@ -107,6 +107,15 @@ export default async function PacksSkiPage() {
             </div>
           </div>
 
+          {allPacks.length === 0 && (
+            <p className="rounded-panel border border-slate-200 bg-white p-6 text-center text-slate-600">
+              {t(
+                "Nos packs de location de ski arrivent bientôt.",
+                "Our ski rental packs are coming soon.",
+              )}
+            </p>
+          )}
+
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {allPacks.map((pack) => {
               return (

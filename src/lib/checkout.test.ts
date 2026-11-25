@@ -7,6 +7,18 @@ import {
   type CatalogProduct,
 } from "@/lib/catalog";
 
+// Les packs ski se créent dans le back-office : on teste avec un pack fictif.
+const SKI_PACK: CatalogProduct = {
+  code: "ski-pack-adulte",
+  name: "Pack ski adulte",
+  description: "",
+  priceCents: 11270,
+  targetAudience: "vacancier",
+  category: "ski",
+  active: true,
+  skier: "adulte",
+};
+
 const base = {
   residence: "arc_1800" as const,
   modeRecuperation: "retrait" as const,
@@ -123,7 +135,7 @@ describe("buildOrderLines — calcul du total au paiement", () => {
 
   it("accepte un pack ski aux deux stations, refuse un pack d'une autre station", () => {
     const pack: CatalogProduct = {
-      ...PRODUCTS.find((p) => p.code === "ski-pack-adulte")!,
+      ...SKI_PACK,
       priceCents: 9900,
       pricePending: undefined,
     };
@@ -181,7 +193,7 @@ describe("supplément journalier dès le 8e jour", () => {
 
 describe("location de ski : durée indépendante du séjour", () => {
   const pack: CatalogProduct = {
-    ...PRODUCTS.find((p) => p.code === "ski-pack-adulte")!,
+    ...SKI_PACK,
     priceCents: 11270,
     pricePending: undefined,
   };
@@ -218,7 +230,7 @@ describe("location de ski : durée indépendante du séjour", () => {
 describe("livraison : réservée au linge", () => {
   const delivery = PRODUCTS.find((p) => p.code === DELIVERY_PRODUCT_CODE)!;
   const ski: CatalogProduct = {
-    ...PRODUCTS.find((p) => p.code === "ski-pack-adulte")!,
+    ...SKI_PACK,
     priceCents: 11270,
     pricePending: undefined,
   };
