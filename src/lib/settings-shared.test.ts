@@ -24,15 +24,15 @@ describe("Réglages du back-office", () => {
   });
 
   it("rend commandable un pack ski dont le prix est renseigné", () => {
-    expect(isOrderable(product("ski-pack-adulte-1800"))).toBe(false);
+    expect(isOrderable(product("ski-pack-adulte"))).toBe(false);
     applySettings({
-      prices: { "ski-pack-adulte-1800": { priceCents: 12900, active: true } },
+      prices: { "ski-pack-adulte": { priceCents: 12900, active: true } },
     });
-    expect(product("ski-pack-adulte-1800").pricePending).toBeUndefined();
+    expect(product("ski-pack-adulte").pricePending).toBeUndefined();
     // Grisé tant que la location de ski n'est pas activée.
-    expect(isOrderable(product("ski-pack-adulte-1800"))).toBe(false);
+    expect(isOrderable(product("ski-pack-adulte"))).toBe(false);
     vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
-    expect(isOrderable(product("ski-pack-adulte-1800"))).toBe(true);
+    expect(isOrderable(product("ski-pack-adulte"))).toBe(true);
     vi.unstubAllEnvs();
   });
 
@@ -45,7 +45,7 @@ describe("Réglages du back-office", () => {
     expect(product("kit-draps-2p").priceCents).toBe(
       original.prices["kit-draps-2p"].priceCents,
     );
-    expect(product("ski-pack-adulte-1800").pricePending).toBeTruthy();
+    expect(product("ski-pack-adulte").pricePending).toBeTruthy();
   });
 
   it("applique les horaires et ignore un champ vide", () => {

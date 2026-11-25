@@ -122,33 +122,26 @@ describe("buildOrderLines — calcul du total au paiement", () => {
     ).toBeNull();
   });
 
-  it("refuse un pack ski d'une autre station", () => {
+  it("accepte un pack ski aux deux stations, refuse un pack d'une autre station", () => {
     vi.stubEnv("NEXT_PUBLIC_SKI_RENTAL_ENABLED", "true");
     const pack: CatalogProduct = {
-      ...PRODUCTS.find((p) => p.code === "ski-pack-adulte-2000")!,
+      ...PRODUCTS.find((p) => p.code === "ski-pack-adulte")!,
       priceCents: 9900,
       pricePending: undefined,
     };
-    expect(
+    const order = (residence: "arc_1800" | "arc_2000", p: CatalogProduct) =>
       buildOrderLines(
         {
           ...base,
-          residence: "arc_1800",
-          items: [{ productCode: pack.code, quantity: 1 }],
+          residence,
+          items: [{ productCode: p.code, quantity: 1 }],
         },
-        [pack],
-      ),
-    ).toBeNull();
-    expect(
-      buildOrderLines(
-        {
-          ...base,
-          residence: "arc_2000",
-          items: [{ productCode: pack.code, quantity: 1 }],
-        },
-        [pack],
-      )!.totalCents,
-    ).toBe(9900);
+        [p],
+      );
+    expect(order("arc_1800", pack)!.totalCents).toBe(9900);
+    expect(order("arc_2000", pack)!.totalCents).toBe(9900);
+    const only1800 = { ...pack, residence: "arc_1800" as const };
+    expect(order("arc_2000", only1800)).toBeNull();
   });
 });
 

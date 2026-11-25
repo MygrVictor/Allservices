@@ -221,58 +221,32 @@ export const PRODUCTS: CatalogProduct[] = [
     active: true,
   },
   // --- Packs location de ski -------------------------------------------
-  // Arc 1800 : magasins Skiset — TARIFS À COMPLÉTER (renseigner priceCents
-  // et retirer pricePending pour activer la commande).
+  // Un pack = un produit valable aux deux stations (retrait à Arc 1800 et
+  // Arc 2000, la station est choisie à la commande). Nom, description et
+  // photo sont modifiables depuis le back-office.
   {
-    code: "ski-pack-adulte-1800",
-    name: "Pack location de ski adulte — Arc 1800 (Skiset)",
+    code: "ski-pack-adulte",
+    name: "Pack location de ski adulte",
     description:
-      "Skis + chaussures + bâtons pour la durée du séjour. Bon à présenter en magasin Skiset.",
+      "Skis + chaussures + bâtons pour la durée du séjour. Bon à présenter en magasin. Retirable à Arc 1800 et Arc 2000.",
     priceCents: 0,
     targetAudience: "vacancier",
     category: "ski",
     active: true,
-    residence: "arc_1800",
     skier: "adulte",
     pricePending: "TARIF À CONFIRMER",
   },
   {
-    code: "ski-pack-enfant-1800",
-    name: "Pack location de ski enfant — Arc 1800 (Skiset)",
+    code: "ski-pack-enfant",
+    name: "Pack location de ski enfant",
     description:
-      "Skis + chaussures + bâtons (+ casque CONTENU À CONFIRMER). Bon à présenter en magasin Skiset.",
+      "Skis + chaussures + bâtons (+ casque CONTENU À CONFIRMER). Bon à présenter en magasin. Retirable à Arc 1800 et Arc 2000.",
     priceCents: 0,
     targetAudience: "vacancier",
     category: "ski",
     active: true,
-    residence: "arc_1800",
     skier: "enfant",
     pricePending: "TARIF À CONFIRMER",
-  },
-  // Arc 2000 : partenaire en cours de négociation.
-  {
-    code: "ski-pack-adulte-2000",
-    name: "Pack location de ski adulte — Arc 2000",
-    description: "Partenaire et contenu du pack en cours de finalisation.",
-    priceCents: 0,
-    targetAudience: "vacancier",
-    category: "ski",
-    active: true,
-    residence: "arc_2000",
-    skier: "adulte",
-    pricePending: "En attente de négociation",
-  },
-  {
-    code: "ski-pack-enfant-2000",
-    name: "Pack location de ski enfant — Arc 2000",
-    description: "Partenaire et contenu du pack en cours de finalisation.",
-    priceCents: 0,
-    targetAudience: "vacancier",
-    category: "ski",
-    active: true,
-    residence: "arc_2000",
-    skier: "enfant",
-    pricePending: "En attente de négociation",
   },
 ];
 
@@ -408,27 +382,17 @@ const PRODUCTS_EN: Record<
     description:
       "Delivered to your accommodation on arrival day, between 5pm and 7pm. Time slot scheduled by our team.",
   },
-  "ski-pack-adulte-1800": {
-    name: "Adult ski rental pack — Arc 1800 (Skiset)",
+  "ski-pack-adulte": {
+    name: "Adult ski rental pack",
     description:
-      "Skis + boots + poles for your stay. Voucher to present at the Skiset shop.",
+      "Skis + boots + poles for your stay. Voucher to present at the shop. Pick-up in Arc 1800 and Arc 2000.",
     pricePending: "PRICE TO BE CONFIRMED",
   },
-  "ski-pack-enfant-1800": {
-    name: "Child ski rental pack — Arc 1800 (Skiset)",
+  "ski-pack-enfant": {
+    name: "Child ski rental pack",
     description:
-      "Skis + boots + poles (+ helmet TO BE CONFIRMED). Voucher to present at the Skiset shop.",
+      "Skis + boots + poles (+ helmet TO BE CONFIRMED). Voucher to present at the shop. Pick-up in Arc 1800 and Arc 2000.",
     pricePending: "PRICE TO BE CONFIRMED",
-  },
-  "ski-pack-adulte-2000": {
-    name: "Adult ski rental pack — Arc 2000",
-    description: "Partner and pack contents being finalised.",
-    pricePending: "Pending negotiation",
-  },
-  "ski-pack-enfant-2000": {
-    name: "Child ski rental pack — Arc 2000",
-    description: "Partner and pack contents being finalised.",
-    pricePending: "Pending negotiation",
   },
 };
 

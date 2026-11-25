@@ -34,21 +34,9 @@ export default async function PacksSkiPage() {
   await loadSettings();
   const locale = getLocale();
   const t = makeT(locale);
-  // Mêmes packs et mêmes tarifs aux deux stations : une seule carte par
-  // type de pack. La station est choisie au moment de finaliser la commande.
-  const seenSkiers = new Set<string>();
-  const allPacks = skiPacks()
-    .filter((p) => {
-      const key = p.skier ?? p.code;
-      if (seenSkiers.has(key)) return false;
-      seenSkiers.add(key);
-      return true;
-    })
-    .map((p) => localizeProduct(p, locale));
-  const packTitle = (skier?: string) =>
-    skier === "enfant"
-      ? t("Pack Enfant", "Child pack")
-      : t("Pack Adulte", "Adult pack");
+  // Chaque pack est un produit (nom, photo, description et prix modifiables
+  // depuis le back-office), retirable aux deux stations.
+  const allPacks = skiPacks().map((p) => localizeProduct(p, locale));
 
   return (
     <>
@@ -121,7 +109,7 @@ export default async function PacksSkiPage() {
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div>
                       <h3 className="text-lg font-bold text-ardoise">
-                        {packTitle(pack.skier)}
+                        {pack.name}
                       </h3>
                     </div>
                     {pack.category === "ski" && (
@@ -135,7 +123,16 @@ export default async function PacksSkiPage() {
                     )}
                   </div>
 
-                  <p className="text-sm text-slate-700 mb-4 flex-1">
+                  {pack.photo && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={pack.photo}
+                      alt={pack.name}
+                      className="mb-4 h-44 w-full rounded-lg bg-white object-cover"
+                    />
+                  )}
+
+                  <p className="text-sm text-slate-700 mb-4 flex-1 whitespace-pre-line">
                     {pack.description}
                   </p>
 
@@ -153,7 +150,7 @@ export default async function PacksSkiPage() {
                     </div>
                     <AddToCartButton
                       code={pack.code}
-                      label={packTitle(pack.skier)}
+                      label={pack.name}
                       disabled={!isOrderable(pack)}
                     />
                   </div>
