@@ -35,7 +35,7 @@ export default async function PacksSkiPage() {
   const locale = getLocale();
   const t = makeT(locale);
   // Chaque pack est un produit (nom, photo, description et prix modifiables
-  // depuis le back-office), retirable aux deux stations.
+  // depuis le back-office), à retirer selon la station choisie au paiement.
   const allPacks = skiPacks().map((p) => localizeProduct(p, locale));
 
   return (
@@ -70,8 +70,8 @@ export default async function PacksSkiPage() {
               </h1>
               <p className="mt-5 max-w-2xl text-lg text-white/85">
                 {t(
-                  "Réservez votre matériel de ski adulte et enfant retirable à Arc 1800 et Arc 2000. Ajoutez vos packs au panier et finalisez votre commande avec votre linge.",
-                  "Book adult and child ski equipment available for pick-up in Arc 1800 and Arc 2000. Add your packs to the basket and complete your order together with your linen.",
+                  "Réservez votre matériel de ski adulte et enfant. Ajoutez vos packs au panier et finalisez votre commande avec votre linge : vous choisissez votre station au moment du paiement.",
+                  "Book adult and child ski equipment. Add your packs to the basket and complete your order together with your linen: you choose your resort at checkout.",
                 )}
               </p>
               <Link
@@ -88,12 +88,28 @@ export default async function PacksSkiPage() {
       <section id="packs" className="scroll-mt-20 py-12">
         <PageContainer>
           <SiteCart />
-          <p className="mb-8 rounded-[20px] border border-accent/40 bg-accent/10 px-5 py-3 text-sm font-semibold text-ardoise">
-            {t(
-              "Matériel retirable à Arc 1800 et à Arc 2000.",
-              "Equipment can be picked up in Arc 1800 and Arc 2000.",
-            )}
-          </p>
+          <div className="mb-8 flex items-start gap-4 rounded-[20px] border border-accent/40 bg-gradient-to-br from-accent/15 to-accent/5 p-4 shadow-sm sm:items-center sm:p-5">
+            <span
+              aria-hidden
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent/25 text-2xl"
+            >
+              📍
+            </span>
+            <div>
+              <p className="font-semibold text-ardoise">
+                {t(
+                  "Retrait du matériel selon votre station",
+                  "Equipment pick-up depends on your resort",
+                )}
+              </p>
+              <p className="mt-0.5 text-sm text-slate-700">
+                {t(
+                  "Le matériel sera à retirer en fonction de la station choisie au moment du paiement.",
+                  "Your equipment will be picked up according to the resort you choose at checkout.",
+                )}
+              </p>
+            </div>
+          </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {allPacks.map((pack) => {

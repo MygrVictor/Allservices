@@ -228,7 +228,7 @@ export const PRODUCTS: CatalogProduct[] = [
     code: "ski-pack-adulte",
     name: "Pack location de ski adulte",
     description:
-      "Skis + chaussures + bâtons pour la durée du séjour. Bon à présenter en magasin. Retirable à Arc 1800 et Arc 2000.",
+      "Skis + chaussures + bâtons pour la durée du séjour. Bon à présenter en magasin.",
     priceCents: 0,
     targetAudience: "vacancier",
     category: "ski",
@@ -240,7 +240,7 @@ export const PRODUCTS: CatalogProduct[] = [
     code: "ski-pack-enfant",
     name: "Pack location de ski enfant",
     description:
-      "Skis + chaussures + bâtons (+ casque CONTENU À CONFIRMER). Bon à présenter en magasin. Retirable à Arc 1800 et Arc 2000.",
+      "Skis + chaussures + bâtons (+ casque CONTENU À CONFIRMER). Bon à présenter en magasin.",
     priceCents: 0,
     targetAudience: "vacancier",
     category: "ski",
@@ -385,13 +385,13 @@ const PRODUCTS_EN: Record<
   "ski-pack-adulte": {
     name: "Adult ski rental pack",
     description:
-      "Skis + boots + poles for your stay. Voucher to present at the shop. Pick-up in Arc 1800 and Arc 2000.",
+      "Skis + boots + poles for your stay. Voucher to present at the shop.",
     pricePending: "PRICE TO BE CONFIRMED",
   },
   "ski-pack-enfant": {
     name: "Child ski rental pack",
     description:
-      "Skis + boots + poles (+ helmet TO BE CONFIRMED). Voucher to present at the shop. Pick-up in Arc 1800 and Arc 2000.",
+      "Skis + boots + poles (+ helmet TO BE CONFIRMED). Voucher to present at the shop.",
     pricePending: "PRICE TO BE CONFIRMED",
   },
 };
