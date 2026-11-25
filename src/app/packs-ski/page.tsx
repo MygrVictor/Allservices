@@ -149,7 +149,7 @@ export default async function PacksSkiPage() {
                     <img
                       src={pack.photo}
                       alt={pack.name}
-                      className="mb-4 h-44 w-full rounded-lg bg-white object-cover"
+                      className="mb-4 h-56 w-full rounded-lg bg-white object-contain"
                     />
                   )}
 

@@ -51,7 +51,7 @@ function ProductTable({
                   <img
                     src={p.photo}
                     alt=""
-                    className="h-12 w-16 rounded object-cover"
+                    className={`h-12 w-16 rounded ${p.category === "ski" ? "bg-white object-contain" : "object-cover"}`}
                   />
                 ) : (
                   <div className="h-12 w-16 rounded bg-slate-100" />
