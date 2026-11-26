@@ -1,13 +1,24 @@
 import Link from "next/link";
 import { PageContainer } from "@/components/page-container";
 import { logout } from "@/app/espace-pro/actions";
+import { AdminPwaRegister } from "@/components/admin-pwa-register";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Back-office",
   robots: { index: false, follow: false },
+  // Back-office installable comme application (s'ouvre directement sur /admin).
+  manifest: "/admin.webmanifest",
+  icons: { apple: "/pwa/icon-180.png" },
+  appleWebApp: {
+    capable: true,
+    title: "AS Admin",
+    statusBarStyle: "default" as const,
+  },
 };
+
+export const viewport = { themeColor: "#343a23" };
 
 const NAV = [
   { href: "/admin", label: "Commandes" },
@@ -22,6 +33,7 @@ export default function AdminLayout({
 }) {
   return (
     <PageContainer>
+      <AdminPwaRegister />
       <div className="py-8">
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-[22px] bg-ardoise px-5 py-4 text-white">
           <p className="font-semibold">Back-office All Services Montagne</p>
