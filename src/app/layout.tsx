@@ -6,6 +6,7 @@ import { LocaleProvider } from "@/components/locale-provider";
 import { CartProvider } from "@/components/cart-provider";
 import { getLocale } from "@/lib/i18n-server";
 import { loadSettings } from "@/lib/settings";
+import { StandaloneRedirect } from "@/components/standalone-redirect";
 import { SettingsHydrator } from "@/components/settings-hydrator";
 import "./globals.css";
 
@@ -87,6 +88,7 @@ export default async function RootLayout({
       className={`${headingFont.variable} ${bodyFont.variable} ${displayFont.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-neige text-slate-800 selection:bg-sapin/20">
+        <StandaloneRedirect />
         <SettingsHydrator settings={settings}>
           <LocaleProvider locale={locale}>
             <CartProvider>
